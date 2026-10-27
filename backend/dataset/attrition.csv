@@ -1,0 +1,501 @@
+Age,MonthlyIncome,JobSatisfaction,WorkLifeBalance,YearsAtCompany,YearsInCurrentRole,YearsSinceLastPromotion,OverTime,BusinessTravel,Department,JobRole,MaritalStatus,Attrition
+29,11474,1,1,0,0,0,Yes,Travel_Frequently,Sales,Sales Executive,Single,Yes
+36,11454,2,4,16,0,6,No,Travel_Frequently,Human Resources,Human Resources,Single,Yes
+49,8024,1,1,21,8,4,No,Travel_Rarely,Sales,Sales Manager,Married,Yes
+38,11259,3,3,1,1,0,Yes,Travel_Rarely,Research & Development,Research Director,Divorced,No
+36,12215,3,4,9,1,3,No,Travel_Frequently,Sales,Sales Executive,Single,No
+39,9373,2,2,21,20,2,Yes,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+42,6186,3,4,24,24,1,Yes,Travel_Rarely,Sales,Sales Manager,Single,Yes
+42,4087,2,3,6,5,3,No,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,No
+59,3289,2,4,27,18,12,Yes,Travel_Rarely,Research & Development,Research Scientist,Single,Yes
+49,12945,3,1,4,3,3,No,Non-Travel,Human Resources,HR Manager,Single,No
+43,17723,1,3,3,2,3,No,Non-Travel,Sales,Sales Executive,Single,No
+41,10637,3,2,20,16,19,Yes,Non-Travel,Sales,Sales Representative,Single,Yes
+23,3203,2,1,0,0,0,Yes,Non-Travel,Sales,Sales Manager,Married,Yes
+30,17600,3,4,2,2,1,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+41,5861,4,1,12,10,10,No,Travel_Rarely,Research & Development,Research Director,Single,No
+57,2904,1,2,14,9,3,Yes,Travel_Rarely,Sales,Sales Executive,Married,No
+39,14655,4,2,21,15,6,Yes,Travel_Frequently,Human Resources,Human Resources,Married,No
+49,8396,1,1,22,13,13,Yes,Non-Travel,Research & Development,Research Scientist,Married,Yes
+37,6363,4,2,6,1,4,Yes,Travel_Frequently,Research & Development,Research Scientist,Single,Yes
+50,4524,1,2,6,0,5,Yes,Travel_Frequently,Human Resources,HR Manager,Married,Yes
+25,8730,4,3,2,1,0,No,Non-Travel,Research & Development,Research Director,Divorced,No
+53,2736,1,3,9,3,4,Yes,Travel_Rarely,Sales,Sales Manager,Divorced,Yes
+32,3764,2,4,0,0,0,Yes,Non-Travel,Sales,Sales Executive,Single,Yes
+27,12772,3,2,6,5,4,No,Non-Travel,Human Resources,HR Manager,Married,No
+30,9308,1,1,10,10,4,No,Non-Travel,Research & Development,Research Scientist,Divorced,Yes
+56,7854,1,2,13,8,4,No,Travel_Frequently,Sales,Sales Manager,Single,Yes
+41,6133,1,2,19,16,0,No,Travel_Rarely,Human Resources,Human Resources,Single,Yes
+39,10080,2,3,9,9,3,No,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+27,12238,3,2,6,6,2,Yes,Travel_Frequently,Sales,Sales Manager,Single,Yes
+49,11343,1,3,0,0,0,Yes,Non-Travel,Human Resources,Human Resources,Single,Yes
+41,14581,1,3,11,0,5,Yes,Non-Travel,Sales,Sales Manager,Married,Yes
+31,14618,2,3,3,1,1,Yes,Travel_Frequently,Research & Development,Research Scientist,Divorced,Yes
+39,5069,4,2,5,5,0,Yes,Travel_Frequently,Research & Development,Research Scientist,Married,No
+36,7553,1,3,0,0,0,No,Non-Travel,Research & Development,Research Director,Divorced,No
+43,11574,1,1,0,0,0,No,Travel_Frequently,Sales,Sales Representative,Married,Yes
+49,10318,4,1,7,6,3,Yes,Non-Travel,Research & Development,Research Director,Divorced,Yes
+34,13592,3,1,11,6,1,No,Travel_Frequently,Human Resources,HR Manager,Divorced,No
+42,12694,2,4,12,11,4,Yes,Travel_Frequently,Human Resources,Human Resources,Divorced,Yes
+58,8843,3,2,19,12,17,No,Non-Travel,Sales,Sales Representative,Divorced,No
+50,6449,2,1,28,21,6,No,Non-Travel,Human Resources,HR Manager,Divorced,Yes
+27,5811,1,1,3,2,1,Yes,Travel_Frequently,Sales,Sales Executive,Divorced,Yes
+51,5797,4,4,26,20,18,No,Travel_Rarely,Sales,Sales Executive,Divorced,No
+49,16831,1,2,14,2,12,No,Travel_Rarely,Human Resources,HR Manager,Married,No
+55,13984,4,2,35,20,28,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+39,5641,1,3,16,15,7,No,Travel_Frequently,Research & Development,Research Director,Married,No
+27,8597,2,1,2,0,0,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Married,Yes
+25,1896,4,4,3,3,3,Yes,Travel_Frequently,Human Resources,HR Manager,Married,Yes
+56,2275,4,4,34,14,31,No,Travel_Frequently,Sales,Sales Representative,Married,No
+32,3175,4,1,13,7,2,Yes,Non-Travel,Human Resources,HR Manager,Married,No
+33,7329,4,3,1,1,1,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Married,Yes
+38,12451,3,2,2,1,0,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+37,9558,2,2,6,6,0,Yes,Non-Travel,Human Resources,Human Resources,Single,Yes
+51,3571,2,3,16,11,5,Yes,Non-Travel,Human Resources,HR Manager,Single,Yes
+47,15731,1,3,22,6,2,Yes,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+44,15273,1,4,17,13,11,No,Travel_Frequently,Sales,Sales Representative,Single,Yes
+51,8936,4,4,9,6,2,No,Non-Travel,Human Resources,Human Resources,Divorced,No
+27,9898,3,1,4,3,1,No,Travel_Frequently,Research & Development,Laboratory Technician,Single,No
+38,3202,1,2,10,4,9,No,Travel_Rarely,Human Resources,Human Resources,Divorced,Yes
+52,13134,2,4,31,28,1,No,Travel_Rarely,Sales,Sales Representative,Married,No
+52,6238,3,4,33,22,27,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+42,17864,3,3,3,1,1,No,Travel_Rarely,Sales,Sales Representative,Single,No
+33,10866,1,1,9,0,8,No,Travel_Frequently,Sales,Sales Manager,Divorced,Yes
+53,9016,4,4,6,6,0,No,Travel_Frequently,Human Resources,HR Manager,Single,No
+52,4244,1,2,7,1,6,Yes,Non-Travel,Research & Development,Research Scientist,Married,Yes
+29,6671,4,4,8,6,3,No,Non-Travel,Human Resources,Human Resources,Married,No
+28,4647,2,2,3,1,2,Yes,Non-Travel,Human Resources,HR Manager,Single,Yes
+50,2966,3,4,30,9,1,No,Non-Travel,Sales,Sales Manager,Single,No
+59,15343,2,3,12,6,1,Yes,Travel_Rarely,Human Resources,HR Manager,Single,No
+60,9999,4,3,18,14,3,No,Non-Travel,Research & Development,Research Director,Married,No
+24,14329,2,1,3,2,2,Yes,Non-Travel,Sales,Sales Executive,Married,Yes
+52,9500,4,1,33,28,17,No,Travel_Frequently,Sales,Sales Manager,Married,No
+28,15129,3,4,2,1,1,No,Non-Travel,Human Resources,HR Manager,Single,No
+38,2688,4,4,10,1,6,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+50,16231,3,4,3,1,2,Yes,Non-Travel,Human Resources,Human Resources,Married,No
+32,15585,1,2,4,4,0,No,Travel_Rarely,Human Resources,Human Resources,Married,Yes
+53,9283,4,2,18,16,8,No,Non-Travel,Research & Development,Research Director,Single,No
+54,6434,3,1,8,1,4,No,Non-Travel,Research & Development,Research Director,Married,No
+53,9260,3,4,9,7,8,No,Travel_Frequently,Research & Development,Research Scientist,Single,Yes
+58,13354,3,4,24,7,24,Yes,Travel_Frequently,Research & Development,Research Director,Married,Yes
+31,3433,1,4,7,0,2,No,Non-Travel,Human Resources,Human Resources,Married,No
+48,12011,3,3,27,20,4,No,Non-Travel,Sales,Sales Representative,Married,No
+56,5646,1,1,24,10,20,No,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+27,13170,4,2,6,0,6,Yes,Travel_Frequently,Human Resources,Human Resources,Single,No
+40,4585,4,2,11,5,6,Yes,Travel_Rarely,Sales,Sales Representative,Single,Yes
+37,12725,4,3,15,4,7,No,Travel_Rarely,Research & Development,Research Director,Married,No
+56,9284,4,3,10,1,7,No,Travel_Frequently,Research & Development,Laboratory Technician,Single,Yes
+28,17822,3,1,3,3,2,No,Non-Travel,Human Resources,Human Resources,Married,No
+60,11972,2,2,31,18,14,No,Travel_Frequently,Human Resources,Human Resources,Divorced,Yes
+28,13798,1,3,10,10,0,No,Travel_Rarely,Research & Development,Laboratory Technician,Single,Yes
+48,6010,3,2,5,1,1,No,Travel_Frequently,Human Resources,HR Manager,Married,No
+29,14754,3,1,7,1,2,No,Travel_Frequently,Sales,Sales Executive,Single,No
+51,3575,4,3,23,21,23,No,Non-Travel,Human Resources,HR Manager,Single,No
+36,4090,4,1,2,2,1,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+29,11422,3,4,1,0,0,No,Non-Travel,Research & Development,Laboratory Technician,Divorced,No
+28,9085,2,4,7,6,4,No,Travel_Rarely,Sales,Sales Manager,Married,No
+45,17348,2,1,17,11,1,No,Travel_Frequently,Research & Development,Research Director,Single,Yes
+60,15395,2,1,1,0,1,Yes,Non-Travel,Sales,Sales Executive,Single,Yes
+43,10650,2,2,24,4,19,No,Travel_Frequently,Sales,Sales Executive,Single,No
+30,6147,1,2,0,0,0,No,Travel_Rarely,Human Resources,Human Resources,Single,Yes
+26,17289,4,2,7,7,5,Yes,Non-Travel,Human Resources,HR Manager,Single,Yes
+51,13471,1,4,1,0,1,No,Travel_Frequently,Research & Development,Laboratory Technician,Single,Yes
+60,9233,4,3,9,1,2,No,Non-Travel,Research & Development,Research Director,Divorced,No
+29,16350,4,4,10,10,8,Yes,Travel_Rarely,Human Resources,HR Manager,Married,No
+47,7932,3,3,13,11,1,No,Travel_Rarely,Research & Development,Research Scientist,Divorced,No
+27,11408,2,1,1,0,1,No,Non-Travel,Sales,Sales Executive,Divorced,No
+48,7561,3,3,11,10,6,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+52,11206,1,3,14,13,1,No,Travel_Rarely,Research & Development,Research Director,Married,Yes
+57,7551,3,3,1,1,0,No,Travel_Rarely,Sales,Sales Manager,Single,No
+47,7963,1,2,2,0,2,Yes,Travel_Frequently,Human Resources,HR Manager,Married,Yes
+41,4379,1,2,23,10,18,Yes,Non-Travel,Human Resources,HR Manager,Single,Yes
+50,14168,3,2,27,15,19,No,Non-Travel,Research & Development,Research Scientist,Single,No
+40,8275,1,2,21,21,18,No,Non-Travel,Research & Development,Laboratory Technician,Single,No
+35,14039,1,4,4,2,2,Yes,Travel_Frequently,Research & Development,Research Director,Single,Yes
+36,9332,4,1,16,11,2,Yes,Travel_Rarely,Research & Development,Research Director,Married,No
+47,17630,4,1,22,20,13,Yes,Travel_Frequently,Research & Development,Research Director,Single,Yes
+51,10384,4,4,23,2,13,Yes,Travel_Rarely,Sales,Sales Manager,Married,Yes
+43,7552,2,3,7,5,2,Yes,Non-Travel,Sales,Sales Executive,Divorced,Yes
+28,17385,1,2,2,1,0,Yes,Non-Travel,Sales,Sales Manager,Married,Yes
+59,9005,3,2,28,21,28,No,Travel_Rarely,Human Resources,HR Manager,Married,No
+39,9204,3,4,18,1,11,Yes,Travel_Rarely,Human Resources,HR Manager,Single,No
+26,7067,4,2,1,1,1,Yes,Non-Travel,Human Resources,Human Resources,Married,No
+50,5859,2,1,6,6,6,Yes,Non-Travel,Research & Development,Research Director,Married,Yes
+55,12923,4,3,10,5,5,No,Non-Travel,Research & Development,Research Director,Single,No
+43,13657,3,3,2,1,0,No,Non-Travel,Human Resources,HR Manager,Divorced,No
+27,6872,2,1,9,2,5,No,Non-Travel,Research & Development,Laboratory Technician,Married,Yes
+30,7740,3,1,10,10,8,No,Travel_Frequently,Sales,Sales Representative,Single,Yes
+53,10117,3,1,12,3,2,Yes,Non-Travel,Sales,Sales Executive,Divorced,Yes
+43,4762,2,2,24,19,4,No,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+50,14127,4,3,2,1,1,Yes,Non-Travel,Human Resources,Human Resources,Married,No
+41,14548,4,3,15,6,11,No,Travel_Frequently,Human Resources,Human Resources,Divorced,No
+34,13455,3,1,4,2,0,No,Non-Travel,Human Resources,Human Resources,Single,No
+39,15180,1,2,14,14,8,No,Travel_Frequently,Sales,Sales Representative,Married,Yes
+25,5478,1,3,6,4,2,No,Travel_Rarely,Sales,Sales Manager,Married,Yes
+43,14232,4,2,25,4,4,No,Non-Travel,Sales,Sales Executive,Married,No
+27,5693,1,3,0,0,0,No,Travel_Frequently,Sales,Sales Representative,Single,No
+51,6572,2,2,4,0,3,Yes,Travel_Frequently,Human Resources,Human Resources,Single,Yes
+58,17420,3,1,26,5,21,Yes,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+46,14044,3,3,27,15,1,No,Travel_Rarely,Human Resources,HR Manager,Married,No
+37,15405,3,2,3,2,1,No,Non-Travel,Sales,Sales Representative,Married,No
+33,14761,2,1,4,0,3,No,Travel_Rarely,Sales,Sales Representative,Single,No
+54,7648,2,3,25,17,15,Yes,Travel_Rarely,Research & Development,Research Scientist,Divorced,Yes
+45,9929,3,2,13,6,11,No,Non-Travel,Research & Development,Research Director,Married,No
+39,7062,2,3,2,2,1,No,Travel_Rarely,Sales,Sales Representative,Single,No
+41,9125,4,3,14,9,11,Yes,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,Yes
+49,17410,3,2,17,1,2,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+24,17356,3,4,1,0,0,No,Non-Travel,Human Resources,HR Manager,Single,No
+45,6950,3,4,11,7,1,Yes,Non-Travel,Human Resources,Human Resources,Married,No
+23,14497,1,3,5,1,3,No,Travel_Frequently,Human Resources,HR Manager,Divorced,No
+53,3238,2,4,12,1,2,No,Non-Travel,Sales,Sales Manager,Married,No
+26,10135,2,3,8,8,4,Yes,Travel_Rarely,Research & Development,Research Scientist,Single,Yes
+37,11826,4,2,15,0,11,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+55,12324,2,3,26,24,13,Yes,Travel_Rarely,Human Resources,HR Manager,Married,Yes
+30,10038,2,4,12,8,10,Yes,Travel_Rarely,Human Resources,HR Manager,Single,Yes
+32,5905,3,1,2,1,2,No,Travel_Rarely,Sales,Sales Representative,Divorced,No
+30,4604,2,2,10,4,9,Yes,Non-Travel,Human Resources,HR Manager,Divorced,Yes
+58,11927,2,4,2,0,0,No,Non-Travel,Sales,Sales Manager,Single,No
+56,2995,3,4,18,9,15,No,Non-Travel,Sales,Sales Representative,Single,No
+52,13829,3,3,29,6,10,Yes,Travel_Frequently,Human Resources,HR Manager,Married,No
+54,9166,1,3,35,6,20,No,Travel_Rarely,Sales,Sales Representative,Single,No
+46,4910,3,3,27,19,13,Yes,Travel_Rarely,Sales,Sales Representative,Married,Yes
+53,5324,4,2,19,15,0,No,Non-Travel,Sales,Sales Representative,Married,No
+53,16258,4,2,30,9,17,Yes,Travel_Frequently,Sales,Sales Representative,Divorced,Yes
+45,3004,3,3,1,1,0,Yes,Travel_Frequently,Human Resources,HR Manager,Divorced,No
+29,5061,3,2,2,0,1,No,Non-Travel,Research & Development,Research Scientist,Divorced,No
+24,7173,2,2,0,0,0,No,Non-Travel,Research & Development,Research Director,Married,No
+41,15165,3,4,18,10,16,No,Travel_Rarely,Human Resources,Human Resources,Married,No
+48,13619,3,2,18,9,0,No,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+31,9025,2,1,13,10,3,Yes,Travel_Frequently,Sales,Sales Manager,Married,Yes
+35,10298,1,2,13,8,12,No,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+55,11795,3,3,24,10,5,No,Travel_Frequently,Research & Development,Laboratory Technician,Single,Yes
+57,9661,4,3,19,7,9,Yes,Travel_Frequently,Research & Development,Research Director,Divorced,Yes
+39,17440,4,3,9,1,9,No,Travel_Rarely,Human Resources,Human Resources,Married,No
+44,15365,2,2,14,10,4,No,Non-Travel,Human Resources,HR Manager,Married,Yes
+30,3441,2,1,1,0,0,Yes,Travel_Frequently,Sales,Sales Executive,Married,Yes
+30,14184,4,2,0,0,0,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+27,16254,2,4,9,3,8,Yes,Travel_Rarely,Human Resources,HR Manager,Single,Yes
+53,17011,3,1,11,11,4,Yes,Travel_Frequently,Sales,Sales Manager,Married,No
+56,15051,3,2,33,31,8,No,Travel_Rarely,Human Resources,HR Manager,Married,No
+38,11809,2,2,5,0,5,No,Non-Travel,Research & Development,Research Director,Married,Yes
+42,7101,2,4,2,1,2,Yes,Travel_Rarely,Sales,Sales Executive,Single,Yes
+50,13150,3,3,17,10,9,Yes,Travel_Rarely,Human Resources,HR Manager,Single,Yes
+41,7821,1,3,5,3,5,No,Non-Travel,Human Resources,Human Resources,Single,No
+52,14282,4,2,9,7,9,No,Travel_Rarely,Research & Development,Research Scientist,Divorced,No
+55,15378,1,1,28,16,22,Yes,Non-Travel,Research & Development,Research Director,Divorced,Yes
+31,3289,2,4,2,1,2,Yes,Non-Travel,Research & Development,Laboratory Technician,Married,Yes
+30,13650,4,3,8,6,7,Yes,Travel_Rarely,Human Resources,Human Resources,Married,No
+35,17956,1,1,2,0,1,Yes,Travel_Frequently,Research & Development,Research Scientist,Single,Yes
+30,9148,3,4,12,10,11,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+44,14189,2,1,3,1,3,Yes,Travel_Rarely,Human Resources,HR Manager,Married,Yes
+56,4888,2,3,24,7,7,No,Non-Travel,Research & Development,Research Director,Single,No
+48,9114,1,1,19,0,7,Yes,Non-Travel,Sales,Sales Executive,Divorced,Yes
+37,10055,1,2,1,1,1,Yes,Travel_Frequently,Sales,Sales Manager,Single,Yes
+58,16156,2,3,20,18,19,No,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+41,2568,4,4,8,0,8,Yes,Travel_Frequently,Human Resources,HR Manager,Divorced,Yes
+48,15715,4,2,13,2,4,Yes,Travel_Rarely,Research & Development,Research Scientist,Married,Yes
+51,5977,4,2,3,3,3,Yes,Travel_Rarely,Human Resources,HR Manager,Married,Yes
+45,12837,3,4,2,2,2,Yes,Non-Travel,Sales,Sales Executive,Divorced,No
+34,17154,1,2,6,3,1,No,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,No
+37,9439,3,4,19,6,12,No,Non-Travel,Sales,Sales Representative,Divorced,No
+45,7873,3,2,16,15,14,No,Travel_Frequently,Sales,Sales Executive,Married,No
+31,5568,2,3,0,0,0,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Divorced,Yes
+57,13805,4,2,21,8,15,No,Travel_Frequently,Human Resources,HR Manager,Single,No
+33,4052,1,4,1,0,0,Yes,Non-Travel,Human Resources,Human Resources,Single,No
+22,1908,4,1,1,1,1,No,Non-Travel,Sales,Sales Executive,Divorced,No
+55,16841,2,1,17,17,9,No,Travel_Rarely,Sales,Sales Executive,Divorced,No
+55,9320,3,4,16,11,8,Yes,Non-Travel,Research & Development,Research Scientist,Single,Yes
+41,8013,1,4,21,2,20,Yes,Travel_Frequently,Human Resources,Human Resources,Divorced,Yes
+32,5564,1,1,1,1,1,No,Travel_Rarely,Human Resources,HR Manager,Divorced,Yes
+39,2056,2,3,1,0,1,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+26,14179,3,4,4,1,4,No,Non-Travel,Sales,Sales Manager,Single,No
+27,7380,2,1,8,5,0,No,Non-Travel,Sales,Sales Representative,Divorced,Yes
+42,8875,3,4,0,0,0,Yes,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,No
+27,4326,1,3,9,4,3,Yes,Travel_Frequently,Human Resources,Human Resources,Divorced,Yes
+46,7696,3,4,10,5,1,Yes,Travel_Frequently,Sales,Sales Executive,Single,No
+49,3268,1,1,28,17,17,No,Travel_Frequently,Human Resources,HR Manager,Divorced,No
+46,13028,2,2,0,0,0,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Single,Yes
+39,6711,3,4,15,4,2,No,Travel_Frequently,Sales,Sales Executive,Single,No
+53,7243,1,4,12,7,1,No,Non-Travel,Sales,Sales Representative,Married,Yes
+50,11683,3,3,21,13,20,Yes,Non-Travel,Human Resources,Human Resources,Single,No
+47,6392,3,4,10,4,10,Yes,Travel_Frequently,Research & Development,Research Director,Married,No
+34,14869,2,4,5,5,4,No,Travel_Frequently,Sales,Sales Representative,Divorced,No
+53,3011,4,4,8,4,3,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Divorced,No
+56,12574,1,2,32,26,2,Yes,Non-Travel,Research & Development,Research Director,Married,Yes
+24,6039,1,1,4,3,2,Yes,Travel_Rarely,Research & Development,Research Director,Divorced,Yes
+59,2202,2,3,14,7,5,No,Travel_Frequently,Research & Development,Research Scientist,Single,No
+29,10337,4,2,11,2,5,No,Travel_Frequently,Research & Development,Laboratory Technician,Married,No
+50,12416,1,3,20,2,9,Yes,Travel_Rarely,Sales,Sales Manager,Divorced,Yes
+37,14870,4,2,16,5,5,No,Travel_Frequently,Research & Development,Research Director,Divorced,No
+49,8170,4,4,25,0,23,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+26,6098,4,1,1,0,1,Yes,Non-Travel,Research & Development,Research Director,Married,No
+42,15652,3,3,19,12,19,Yes,Travel_Frequently,Research & Development,Research Director,Divorced,No
+41,5708,3,1,19,18,2,Yes,Travel_Frequently,Human Resources,Human Resources,Single,No
+54,9773,4,2,24,13,19,No,Non-Travel,Sales,Sales Manager,Divorced,No
+33,11948,3,4,5,3,2,Yes,Travel_Rarely,Sales,Sales Representative,Married,Yes
+30,9806,4,4,3,3,3,No,Travel_Rarely,Research & Development,Research Scientist,Single,No
+40,11067,2,4,1,1,0,No,Non-Travel,Human Resources,Human Resources,Married,No
+58,8765,4,2,7,4,5,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,Yes
+41,14507,4,1,1,1,1,Yes,Travel_Rarely,Research & Development,Research Director,Single,Yes
+44,15128,2,2,22,19,20,Yes,Travel_Rarely,Research & Development,Research Director,Single,Yes
+39,17404,3,3,19,17,5,No,Non-Travel,Research & Development,Research Scientist,Divorced,No
+48,4196,2,2,29,1,8,Yes,Non-Travel,Human Resources,HR Manager,Married,Yes
+53,3037,4,4,9,9,4,No,Non-Travel,Human Resources,HR Manager,Single,No
+45,12201,1,4,14,7,5,Yes,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+56,15371,3,3,25,6,13,No,Travel_Frequently,Sales,Sales Executive,Married,No
+58,3835,4,1,31,21,3,Yes,Travel_Rarely,Sales,Sales Representative,Married,No
+34,3150,3,3,4,2,1,Yes,Travel_Frequently,Research & Development,Research Scientist,Divorced,Yes
+25,13329,4,1,6,5,2,Yes,Travel_Rarely,Human Resources,Human Resources,Single,No
+30,13196,1,1,9,3,8,No,Travel_Frequently,Human Resources,HR Manager,Single,Yes
+30,6933,1,1,7,1,3,Yes,Travel_Frequently,Research & Development,Research Scientist,Married,Yes
+31,16871,2,2,1,0,0,No,Travel_Frequently,Research & Development,Research Scientist,Divorced,Yes
+27,6952,3,4,1,0,0,No,Travel_Rarely,Human Resources,Human Resources,Single,No
+37,14052,2,2,17,9,0,No,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+53,17101,1,3,24,3,7,Yes,Travel_Frequently,Research & Development,Research Director,Single,Yes
+48,11423,1,1,11,8,10,No,Travel_Rarely,Sales,Sales Executive,Single,Yes
+25,3150,4,4,6,4,2,No,Non-Travel,Human Resources,Human Resources,Divorced,No
+39,8201,2,3,2,1,0,Yes,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+41,3700,1,4,22,13,7,Yes,Travel_Frequently,Sales,Sales Representative,Divorced,Yes
+33,17414,2,4,3,0,1,Yes,Travel_Frequently,Human Resources,HR Manager,Divorced,Yes
+32,15023,1,3,5,1,5,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Married,Yes
+58,15879,1,4,4,3,3,No,Non-Travel,Human Resources,HR Manager,Single,No
+28,5806,1,1,9,1,3,Yes,Travel_Rarely,Human Resources,Human Resources,Married,Yes
+33,6244,4,3,1,1,0,Yes,Travel_Rarely,Research & Development,Research Director,Divorced,No
+25,15989,1,4,2,0,2,No,Travel_Frequently,Sales,Sales Manager,Married,No
+51,7833,2,4,0,0,0,No,Non-Travel,Research & Development,Research Scientist,Married,Yes
+56,12219,2,3,15,4,0,Yes,Non-Travel,Research & Development,Research Scientist,Single,Yes
+46,8678,2,2,27,23,23,Yes,Travel_Frequently,Research & Development,Research Scientist,Single,Yes
+39,17767,3,4,2,0,0,No,Non-Travel,Human Resources,Human Resources,Single,No
+47,6578,2,2,2,2,2,No,Travel_Frequently,Sales,Sales Representative,Married,Yes
+42,14578,2,2,10,7,4,Yes,Non-Travel,Sales,Sales Executive,Single,Yes
+50,6851,2,4,29,10,13,No,Travel_Frequently,Sales,Sales Executive,Married,Yes
+32,4230,2,3,12,10,4,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+47,15801,1,4,16,1,9,Yes,Travel_Frequently,Research & Development,Research Scientist,Divorced,Yes
+28,3941,1,2,7,1,2,Yes,Travel_Rarely,Sales,Sales Manager,Married,Yes
+27,16586,1,2,9,9,4,Yes,Non-Travel,Sales,Sales Executive,Married,Yes
+43,9928,4,4,3,0,3,Yes,Travel_Rarely,Sales,Sales Executive,Married,No
+44,11861,2,1,6,1,2,No,Non-Travel,Research & Development,Laboratory Technician,Divorced,No
+53,4048,3,4,26,17,15,Yes,Travel_Frequently,Sales,Sales Manager,Single,Yes
+37,7436,4,4,17,0,12,No,Non-Travel,Human Resources,HR Manager,Divorced,No
+33,10474,1,4,0,0,0,No,Travel_Frequently,Sales,Sales Executive,Divorced,Yes
+28,7613,2,4,3,1,2,Yes,Travel_Rarely,Human Resources,HR Manager,Single,No
+44,10682,2,4,18,0,11,Yes,Travel_Frequently,Human Resources,Human Resources,Single,Yes
+25,16838,1,3,3,1,0,No,Non-Travel,Human Resources,HR Manager,Single,Yes
+33,17537,1,3,10,0,0,Yes,Travel_Rarely,Sales,Sales Manager,Married,Yes
+47,13798,2,2,18,3,10,No,Travel_Frequently,Research & Development,Research Director,Divorced,Yes
+42,7999,2,2,5,5,4,No,Travel_Frequently,Human Resources,Human Resources,Divorced,Yes
+33,17146,2,1,0,0,0,No,Travel_Frequently,Sales,Sales Executive,Single,Yes
+37,1986,3,4,11,5,2,Yes,Travel_Frequently,Human Resources,Human Resources,Single,No
+44,17677,4,4,8,1,0,No,Travel_Rarely,Sales,Sales Representative,Married,No
+44,3007,2,4,17,12,3,Yes,Travel_Rarely,Research & Development,Laboratory Technician,Married,No
+28,7336,1,1,1,1,0,Yes,Non-Travel,Research & Development,Research Director,Divorced,Yes
+23,5167,1,3,3,1,3,Yes,Travel_Rarely,Sales,Sales Manager,Married,Yes
+56,11167,1,4,16,9,9,Yes,Non-Travel,Sales,Sales Representative,Married,No
+22,2221,2,1,3,0,2,No,Travel_Rarely,Human Resources,Human Resources,Single,Yes
+52,12316,3,1,7,4,6,No,Non-Travel,Research & Development,Laboratory Technician,Married,No
+45,5506,4,3,5,3,0,No,Travel_Frequently,Research & Development,Research Director,Divorced,No
+28,15208,1,4,1,1,1,Yes,Non-Travel,Human Resources,HR Manager,Married,Yes
+58,3770,1,2,15,15,9,No,Travel_Frequently,Sales,Sales Executive,Single,Yes
+35,15276,4,2,6,1,0,Yes,Non-Travel,Research & Development,Laboratory Technician,Single,Yes
+42,10314,3,3,23,2,2,No,Travel_Frequently,Research & Development,Research Director,Single,No
+59,16954,2,1,33,26,7,Yes,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,Yes
+56,4621,4,1,22,13,8,No,Travel_Frequently,Research & Development,Research Director,Married,No
+47,16886,1,4,1,1,1,Yes,Travel_Frequently,Human Resources,HR Manager,Married,No
+41,14481,3,4,8,7,1,Yes,Travel_Frequently,Sales,Sales Manager,Married,Yes
+27,10242,3,1,3,3,1,No,Travel_Rarely,Research & Development,Research Director,Single,No
+47,15513,2,2,4,4,4,Yes,Travel_Rarely,Sales,Sales Executive,Single,Yes
+45,12960,4,1,22,6,8,No,Travel_Rarely,Research & Development,Research Director,Single,No
+50,15524,3,2,11,7,9,No,Travel_Frequently,Human Resources,Human Resources,Divorced,Yes
+40,12903,2,2,0,0,0,Yes,Travel_Rarely,Sales,Sales Manager,Married,Yes
+23,5935,1,2,5,0,3,Yes,Non-Travel,Sales,Sales Manager,Married,Yes
+39,9446,3,2,13,6,13,No,Travel_Frequently,Research & Development,Research Director,Divorced,No
+47,13013,3,3,18,3,0,No,Travel_Rarely,Human Resources,HR Manager,Married,No
+42,14996,2,1,8,4,4,Yes,Non-Travel,Sales,Sales Manager,Married,Yes
+30,8428,3,4,11,0,10,No,Travel_Frequently,Research & Development,Research Director,Divorced,No
+58,10111,4,3,12,5,11,Yes,Travel_Frequently,Human Resources,Human Resources,Single,Yes
+40,12522,2,3,3,3,1,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+48,9509,4,1,25,10,11,No,Travel_Rarely,Research & Development,Research Director,Divorced,No
+26,2685,3,4,7,3,1,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+48,7249,1,4,18,14,4,Yes,Non-Travel,Research & Development,Research Scientist,Single,Yes
+22,3920,4,1,3,2,1,Yes,Non-Travel,Sales,Sales Representative,Married,Yes
+49,16414,3,1,30,12,0,Yes,Travel_Frequently,Sales,Sales Manager,Divorced,No
+22,10046,1,4,1,0,1,Yes,Non-Travel,Research & Development,Research Scientist,Married,No
+41,7415,4,2,9,7,8,No,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+47,11461,2,1,0,0,0,Yes,Non-Travel,Human Resources,Human Resources,Single,Yes
+46,12508,1,1,28,20,8,Yes,Travel_Rarely,Human Resources,HR Manager,Single,Yes
+50,13190,2,2,24,3,17,No,Non-Travel,Research & Development,Laboratory Technician,Divorced,No
+28,10181,4,1,10,8,4,Yes,Non-Travel,Human Resources,Human Resources,Divorced,No
+28,6639,3,4,7,3,3,Yes,Travel_Rarely,Research & Development,Research Scientist,Single,No
+52,4243,1,4,21,7,0,Yes,Travel_Rarely,Sales,Sales Manager,Divorced,No
+28,3435,4,1,4,1,3,No,Travel_Rarely,Research & Development,Laboratory Technician,Single,No
+42,12668,1,2,13,11,1,Yes,Non-Travel,Sales,Sales Representative,Single,Yes
+39,17566,4,4,2,1,1,Yes,Travel_Frequently,Sales,Sales Manager,Married,Yes
+52,17882,2,1,26,20,25,Yes,Travel_Rarely,Sales,Sales Manager,Single,Yes
+52,9714,1,2,28,5,19,No,Travel_Frequently,Research & Development,Laboratory Technician,Single,Yes
+24,8891,3,1,0,0,0,Yes,Non-Travel,Sales,Sales Representative,Divorced,No
+46,15757,2,4,4,4,4,Yes,Travel_Frequently,Sales,Sales Representative,Single,No
+42,15187,4,4,7,5,4,Yes,Travel_Rarely,Sales,Sales Manager,Single,No
+50,3481,4,1,5,3,3,Yes,Travel_Frequently,Research & Development,Research Director,Married,No
+22,15321,3,3,0,0,0,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+57,14240,1,1,30,22,21,No,Non-Travel,Research & Development,Laboratory Technician,Single,No
+40,9867,1,2,17,16,11,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,Yes
+28,9288,4,2,4,4,1,Yes,Travel_Rarely,Sales,Sales Representative,Divorced,No
+24,17591,4,2,5,5,4,No,Travel_Frequently,Sales,Sales Executive,Single,No
+57,3496,2,2,27,26,18,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Divorced,Yes
+54,17587,3,4,24,13,19,Yes,Travel_Frequently,Human Resources,Human Resources,Married,No
+30,5091,3,2,6,4,5,No,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+30,11012,1,3,11,10,2,No,Travel_Frequently,Human Resources,HR Manager,Divorced,No
+56,4181,1,4,18,13,0,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+32,7676,2,1,4,2,1,No,Travel_Frequently,Sales,Sales Manager,Single,Yes
+57,13153,2,3,14,11,10,No,Non-Travel,Human Resources,HR Manager,Single,Yes
+48,5127,1,3,30,25,21,Yes,Non-Travel,Research & Development,Research Director,Married,Yes
+45,9153,2,3,24,18,17,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+54,4436,3,2,7,6,0,No,Non-Travel,Research & Development,Laboratory Technician,Married,No
+31,14741,3,4,0,0,0,Yes,Non-Travel,Human Resources,HR Manager,Divorced,No
+55,3306,4,4,14,2,8,Yes,Travel_Frequently,Sales,Sales Manager,Single,Yes
+43,12759,1,1,10,5,4,No,Travel_Frequently,Sales,Sales Manager,Married,No
+37,2204,3,3,1,1,1,No,Non-Travel,Sales,Sales Manager,Married,No
+50,17335,3,1,31,2,18,Yes,Travel_Rarely,Human Resources,Human Resources,Single,Yes
+26,14037,4,1,3,1,3,Yes,Non-Travel,Sales,Sales Manager,Single,No
+43,11220,3,1,1,0,0,Yes,Travel_Rarely,Sales,Sales Representative,Married,No
+47,14185,1,1,13,5,0,Yes,Non-Travel,Research & Development,Research Scientist,Divorced,No
+44,14338,1,3,16,3,9,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+52,6683,3,2,10,8,3,No,Non-Travel,Sales,Sales Executive,Divorced,No
+57,6792,4,1,35,9,7,Yes,Travel_Rarely,Sales,Sales Manager,Divorced,Yes
+44,5417,2,2,6,3,5,Yes,Non-Travel,Human Resources,Human Resources,Married,Yes
+58,5034,3,1,3,3,0,Yes,Non-Travel,Research & Development,Laboratory Technician,Divorced,No
+44,9760,2,3,4,1,0,Yes,Travel_Frequently,Research & Development,Laboratory Technician,Married,Yes
+59,1879,4,2,9,9,9,No,Travel_Frequently,Research & Development,Research Director,Single,Yes
+49,9096,4,4,17,11,4,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+33,13718,3,1,2,1,0,Yes,Travel_Rarely,Human Resources,Human Resources,Single,Yes
+59,12513,3,4,25,24,18,Yes,Travel_Rarely,Sales,Sales Manager,Married,No
+40,10027,4,3,4,3,4,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+54,2462,4,3,8,7,2,Yes,Travel_Rarely,Sales,Sales Representative,Married,No
+45,16838,4,4,7,0,3,No,Travel_Frequently,Human Resources,HR Manager,Single,No
+28,7785,4,4,8,4,4,Yes,Non-Travel,Human Resources,Human Resources,Divorced,Yes
+55,9776,3,3,16,12,7,No,Travel_Frequently,Human Resources,Human Resources,Divorced,No
+50,4862,2,2,10,3,1,No,Travel_Rarely,Human Resources,Human Resources,Married,Yes
+36,9648,4,4,13,12,5,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,No
+23,16394,2,1,1,0,0,Yes,Non-Travel,Human Resources,HR Manager,Single,Yes
+33,5348,3,1,12,9,9,Yes,Travel_Frequently,Human Resources,HR Manager,Divorced,Yes
+32,13665,3,2,3,3,1,Yes,Non-Travel,Human Resources,Human Resources,Married,Yes
+36,15341,2,4,12,6,2,Yes,Travel_Rarely,Sales,Sales Representative,Divorced,No
+60,16578,4,2,2,2,2,Yes,Non-Travel,Sales,Sales Manager,Divorced,Yes
+49,14736,2,4,26,11,1,No,Travel_Frequently,Human Resources,Human Resources,Married,No
+49,6023,3,4,8,4,7,Yes,Travel_Rarely,Sales,Sales Executive,Single,Yes
+58,8498,2,3,33,7,33,No,Travel_Frequently,Sales,Sales Manager,Single,No
+59,14169,3,4,16,8,13,No,Travel_Rarely,Human Resources,HR Manager,Married,No
+33,14484,3,3,11,8,8,No,Non-Travel,Research & Development,Research Director,Married,No
+29,10128,1,2,11,3,7,Yes,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+32,3244,4,4,6,5,0,Yes,Travel_Rarely,Sales,Sales Executive,Married,No
+60,12290,1,2,2,2,1,No,Travel_Frequently,Research & Development,Research Director,Married,No
+55,7693,2,1,18,6,1,Yes,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+27,10282,4,2,4,3,2,No,Travel_Rarely,Human Resources,Human Resources,Divorced,No
+57,11734,3,2,18,17,18,No,Travel_Rarely,Research & Development,Research Director,Married,Yes
+22,7370,1,3,2,0,1,Yes,Travel_Rarely,Human Resources,HR Manager,Divorced,Yes
+50,16488,4,4,24,18,15,No,Non-Travel,Sales,Sales Representative,Single,No
+26,17454,3,4,6,5,6,Yes,Travel_Frequently,Sales,Sales Manager,Divorced,No
+38,9607,1,2,7,4,1,No,Travel_Frequently,Research & Development,Research Director,Married,No
+39,13849,2,2,5,5,5,No,Travel_Rarely,Sales,Sales Executive,Married,No
+37,11856,1,4,19,11,4,Yes,Travel_Rarely,Sales,Sales Representative,Divorced,Yes
+45,17928,4,2,19,10,15,No,Non-Travel,Human Resources,Human Resources,Married,No
+25,9290,4,2,6,3,4,No,Travel_Rarely,Sales,Sales Representative,Divorced,No
+22,11839,3,3,0,0,0,Yes,Travel_Frequently,Human Resources,Human Resources,Single,No
+39,8666,4,2,15,10,11,No,Non-Travel,Sales,Sales Representative,Married,No
+39,14974,1,3,14,2,9,Yes,Travel_Rarely,Sales,Sales Representative,Divorced,Yes
+34,4003,4,4,4,1,3,Yes,Non-Travel,Sales,Sales Representative,Divorced,No
+53,13113,4,1,19,8,17,Yes,Travel_Rarely,Human Resources,HR Manager,Single,No
+52,10980,3,3,6,3,5,No,Non-Travel,Research & Development,Laboratory Technician,Married,No
+29,7126,3,3,5,5,4,Yes,Non-Travel,Sales,Sales Manager,Divorced,No
+50,12295,2,2,5,3,4,No,Travel_Frequently,Research & Development,Research Director,Married,Yes
+47,6991,2,3,27,2,2,No,Non-Travel,Sales,Sales Manager,Married,No
+47,4812,4,2,8,7,5,No,Travel_Rarely,Human Resources,HR Manager,Single,Yes
+27,10785,1,4,3,1,3,Yes,Travel_Rarely,Sales,Sales Manager,Single,Yes
+27,5853,3,2,1,1,0,No,Non-Travel,Sales,Sales Executive,Married,No
+30,9454,3,4,8,2,0,No,Non-Travel,Sales,Sales Executive,Married,No
+56,9691,3,3,11,9,9,No,Non-Travel,Research & Development,Laboratory Technician,Single,No
+41,10374,1,1,11,6,4,No,Travel_Rarely,Sales,Sales Manager,Married,No
+22,14854,3,2,3,3,2,No,Travel_Rarely,Sales,Sales Representative,Divorced,No
+57,6108,4,2,27,12,7,No,Travel_Rarely,Sales,Sales Manager,Married,No
+39,4038,1,2,9,8,4,Yes,Travel_Frequently,Research & Development,Research Director,Single,Yes
+50,17687,2,1,17,15,6,Yes,Non-Travel,Research & Development,Research Scientist,Single,Yes
+40,4268,2,1,8,2,7,Yes,Travel_Rarely,Human Resources,HR Manager,Married,Yes
+41,15620,3,1,15,11,14,Yes,Travel_Rarely,Human Resources,HR Manager,Single,No
+26,3798,4,1,8,7,2,No,Non-Travel,Sales,Sales Representative,Single,No
+37,8175,2,4,1,0,1,Yes,Non-Travel,Human Resources,Human Resources,Married,Yes
+24,5055,4,3,5,4,4,No,Travel_Frequently,Sales,Sales Executive,Single,No
+29,8284,3,1,3,3,2,Yes,Travel_Rarely,Sales,Sales Manager,Single,Yes
+52,13038,4,1,9,5,1,Yes,Non-Travel,Sales,Sales Manager,Married,Yes
+25,5612,2,4,0,0,0,Yes,Travel_Frequently,Human Resources,HR Manager,Divorced,Yes
+50,16523,2,3,12,0,11,No,Travel_Rarely,Research & Development,Research Director,Married,Yes
+40,13799,3,3,17,15,6,Yes,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+26,1811,3,4,8,2,7,No,Non-Travel,Research & Development,Research Scientist,Divorced,No
+23,4910,1,4,4,2,4,No,Non-Travel,Sales,Sales Manager,Divorced,No
+31,10372,1,1,9,4,5,No,Non-Travel,Research & Development,Research Scientist,Single,No
+33,11155,1,1,1,0,0,Yes,Non-Travel,Research & Development,Research Director,Married,Yes
+59,12543,1,2,16,1,11,Yes,Travel_Frequently,Sales,Sales Manager,Single,Yes
+25,10467,1,3,5,4,5,No,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,No
+26,4964,4,2,3,0,0,Yes,Non-Travel,Human Resources,Human Resources,Divorced,No
+57,16264,4,4,35,26,6,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+54,10812,3,3,21,21,5,No,Travel_Frequently,Human Resources,HR Manager,Married,No
+42,7698,4,3,19,7,18,Yes,Travel_Frequently,Human Resources,Human Resources,Married,Yes
+24,6720,3,1,2,2,0,Yes,Travel_Rarely,Human Resources,Human Resources,Single,Yes
+39,9342,1,1,17,16,17,Yes,Travel_Frequently,Human Resources,HR Manager,Single,Yes
+59,13830,4,2,15,7,8,Yes,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,No
+33,16903,1,1,15,3,9,No,Travel_Frequently,Sales,Sales Representative,Married,Yes
+48,6793,4,1,29,27,3,Yes,Non-Travel,Sales,Sales Manager,Single,No
+31,17709,1,4,5,4,5,Yes,Travel_Frequently,Sales,Sales Executive,Divorced,Yes
+36,3152,2,3,13,4,12,Yes,Travel_Frequently,Research & Development,Research Director,Divorced,Yes
+47,9679,2,2,8,1,6,No,Non-Travel,Human Resources,Human Resources,Single,Yes
+57,13018,4,3,33,15,15,No,Non-Travel,Sales,Sales Representative,Single,No
+49,4573,1,3,23,11,6,No,Travel_Frequently,Research & Development,Laboratory Technician,Divorced,Yes
+31,3641,2,1,7,0,3,No,Non-Travel,Sales,Sales Manager,Single,No
+31,6799,3,1,13,13,13,Yes,Travel_Frequently,Research & Development,Research Scientist,Married,No
+56,13188,4,2,13,3,8,No,Non-Travel,Human Resources,Human Resources,Divorced,No
+38,12527,1,4,5,0,2,No,Travel_Rarely,Sales,Sales Representative,Single,No
+45,10131,2,4,27,3,0,No,Non-Travel,Research & Development,Laboratory Technician,Single,Yes
+60,5853,1,1,34,5,11,No,Non-Travel,Sales,Sales Representative,Married,No
+32,15102,2,3,0,0,0,No,Travel_Rarely,Research & Development,Laboratory Technician,Divorced,No
+23,3238,4,2,4,2,1,No,Non-Travel,Sales,Sales Manager,Married,No
+36,9159,3,3,13,3,9,No,Non-Travel,Sales,Sales Executive,Single,No
+59,12551,4,2,34,12,8,Yes,Non-Travel,Research & Development,Research Director,Single,Yes
+56,17548,3,4,7,2,5,Yes,Travel_Frequently,Sales,Sales Manager,Married,No
+39,11722,1,3,4,1,0,Yes,Non-Travel,Sales,Sales Executive,Divorced,No
+36,13465,2,4,0,0,0,No,Non-Travel,Human Resources,HR Manager,Married,No
+53,14326,1,4,30,4,5,Yes,Travel_Rarely,Sales,Sales Executive,Married,Yes
+34,16342,3,4,6,0,1,No,Travel_Rarely,Research & Development,Research Scientist,Married,No
+60,9285,1,4,24,23,10,Yes,Travel_Rarely,Research & Development,Laboratory Technician,Single,Yes
+24,9001,2,3,4,3,4,Yes,Travel_Frequently,Human Resources,HR Manager,Married,Yes
+51,15396,2,4,10,6,4,Yes,Non-Travel,Human Resources,Human Resources,Married,No
+33,9233,1,2,4,3,3,No,Non-Travel,Research & Development,Laboratory Technician,Divorced,Yes
+27,13370,1,1,4,2,1,Yes,Travel_Frequently,Human Resources,HR Manager,Divorced,Yes
+54,11065,2,3,10,6,8,Yes,Non-Travel,Research & Development,Research Scientist,Single,Yes
+33,3726,3,2,1,1,1,No,Travel_Rarely,Research & Development,Laboratory Technician,Single,No
+22,5353,4,2,3,3,3,Yes,Non-Travel,Human Resources,HR Manager,Divorced,No
+50,2601,3,2,5,4,4,Yes,Travel_Rarely,Sales,Sales Representative,Single,No
+24,8631,1,1,1,0,1,Yes,Travel_Rarely,Research & Development,Research Director,Single,Yes
+60,14391,1,1,35,11,29,No,Travel_Frequently,Human Resources,HR Manager,Married,Yes
+26,3799,4,2,6,6,4,No,Non-Travel,Sales,Sales Representative,Married,No
+55,9724,1,1,13,11,3,Yes,Non-Travel,Human Resources,HR Manager,Divorced,Yes
+49,10314,2,4,20,8,16,No,Non-Travel,Human Resources,Human Resources,Divorced,No
+36,13882,4,1,9,3,0,Yes,Travel_Rarely,Sales,Sales Representative,Divorced,Yes
+24,13105,1,2,2,1,2,Yes,Travel_Frequently,Human Resources,HR Manager,Married,Yes
+41,13668,3,4,16,10,0,No,Non-Travel,Sales,Sales Executive,Divorced,No
+34,9688,1,2,10,5,10,No,Travel_Rarely,Research & Development,Research Director,Divorced,Yes
+43,10896,3,3,14,12,13,Yes,Non-Travel,Research & Development,Research Director,Single,No
+43,7356,3,1,25,25,11,Yes,Travel_Frequently,Sales,Sales Executive,Divorced,Yes
+58,6248,3,1,24,5,19,No,Travel_Frequently,Sales,Sales Executive,Single,No
+45,7931,2,1,14,13,4,No,Travel_Rarely,Sales,Sales Representative,Single,Yes
+54,14506,4,3,1,1,0,No,Travel_Frequently,Sales,Sales Executive,Single,No
+55,6895,1,1,8,3,0,No,Travel_Rarely,Research & Development,Research Scientist,Divorced,Yes
+43,12266,1,3,14,14,0,No,Travel_Rarely,Sales,Sales Representative,Married,No
+39,4380,3,2,17,10,14,Yes,Travel_Frequently,Human Resources,Human Resources,Single,No
+35,11205,2,3,17,11,17,No,Travel_Rarely,Research & Development,Research Director,Single,No
+43,3535,4,1,17,14,1,Yes,Travel_Frequently,Sales,Sales Representative,Single,No
+33,17752,2,1,14,9,5,No,Travel_Frequently,Research & Development,Research Director,Divorced,No
+51,17322,4,2,6,3,2,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+45,9787,3,4,12,2,11,No,Travel_Rarely,Human Resources,HR Manager,Single,No
+52,8446,2,1,29,27,5,No,Non-Travel,Research & Development,Research Director,Single,Yes
+26,10777,2,2,4,4,3,No,Travel_Rarely,Research & Development,Laboratory Technician,Married,No
+35,12656,2,2,13,12,6,No,Non-Travel,Human Resources,HR Manager,Single,Yes
+29,6846,4,2,9,9,7,Yes,Travel_Frequently,Research & Development,Research Director,Single,Yes

@@ -1,0 +1,180 @@
+      startDate: '',
+      endDate: '',
+      modelType: '',
+    })
+  }
+
+  async function exportAttritionHistoryPDF() {
+    if (!canManage) return
+
+    setHistoryError('')
+
+    const employeeFilter = historyEmployeeFilter.trim()
+    const riskFilter = historyRiskFilter
+    const startDateFilter = historyStartDateFilter
+    const endDateFilter = historyEndDateFilter
+    const modelTypeFilter = historyModelTypeFilter.trim()
+
+    if (
+      startDateFilter &&
+      endDateFilter &&
+      startDateFilter > endDateFilter
+    ) {
+      setHistoryError('Start date must be on or before end date.')
+      return
+    }
+
+    const params = {}
+
+    if (employeeFilter) {
+      const employeeId = Number(employeeFilter)
+
+      if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        setHistoryError('Employee filter must be a positive integer ID.')
+        return
+      }
+
+      params.employee_id = employeeId
+    }
+
+    if (riskFilter) params.risk_level = riskFilter
+    if (startDateFilter) params.start_date = startDateFilter
+    if (endDateFilter) params.end_date = endDateFilter
+    if (modelTypeFilter) params.model_type = modelTypeFilter
+
+    const filterSummary = [
+      employeeFilter ? `Employee ID: ${employeeFilter}` : '',
+      riskFilter ? `Risk Level: ${riskFilter}` : '',
+      startDateFilter ? `Start Date: ${startDateFilter}` : '',
+      endDateFilter ? `End Date: ${endDateFilter}` : '',
+      modelTypeFilter ? `Model Type: ${modelTypeFilter}` : '',
+    ].filter(Boolean)
+
+    const printWindow = window.open('', '_blank')
+
+    if (!printWindow) {
+      setHistoryError('Allow pop-ups in your browser to generate the PDF report.')
+      return
+    }
+
+    printWindow.document.open()
+    printWindow.document.write(
+      '<!DOCTYPE html><html><head><title>Attrition History Report</title></head>' +
+      '<body style="font-family:Arial,sans-serif;padding:24px">' +
+      '<h2>WorkForce AI Pro â€” Attrition History</h2>' +
+      '<p>Loading prediction history...</p></body></html>'
+    )
+    printWindow.document.close()
+
+    setHistoryLoading(true)
+
+    try {
+      const pageSize = 100
+      let page = 1
+      let total = 0
+      const allRecords = []
+      const maxPages = 10000
+
+      while (page <= maxPages) {
+        const result = await attritionAPI.history({
+          ...params,
+          page,
+          page_size: pageSize,
+        })
+
+        const items = Array.isArray(result.items) ? result.items : []
+        total = Number(result.total) || 0
+
+        if (items.length === 0) break
+
+        allRecords.push(...items)
+
+        if (allRecords.length >= total || items.length < pageSize) break
+
+        page += 1
+      }
+
+      if (page > maxPages) {
+        throw new Error('PDF export stopped because the pagination limit was reached.')
+      }
+
+      const escapeHTML = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (character) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[character])
+
+      const reportDate = new Date().toLocaleString()
+
+      const rowsHTML = allRecords.map((record) => {
+        const date = record.created_at
+          ? new Date(record.created_at).toLocaleString()
+          : ''
+
+        const employee = record.employee_id == null
+          ? 'General prediction'
+          : record.employee_id
+
+        const probability = record.attrition_risk_percentage ??
+          (record.attrition_probability == null
+            ? ''
+            : Number(record.attrition_probability) * 100)
+
+        const predictedBy = record.predicted_by_name ||
+          (record.predicted_by_user_id != null
+            ? `User #${record.predicted_by_user_id}`
+            : '')
+
+        return `<tr>
+          <td>${escapeHTML(date)}</td>
+          <td>${escapeHTML(employee)}</td>
+          <td>${escapeHTML(record.risk_level)}</td>
+          <td>${escapeHTML(probability === '' ? '' : Number(probability).toFixed(2) + '%')}</td>
+          <td>${escapeHTML(record.model_type)}</td>
+          <td>${escapeHTML(predictedBy)}</td>
+        </tr>`
+      }).join('')
+
+      const reportHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attrition History Report</title>
+<style>
+body { font-family: Arial, sans-serif; color: #1f2937; margin: 28px; }
+h1 { margin-bottom: 6px; font-size: 24px; }
+.subtitle { color: #64748b; margin-bottom: 20px; }
+.filters { padding: 12px; background: #f1f5f9; border-radius: 8px; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+th, td { border: 1px solid #dbe2ea; padding: 8px; text-align: left; overflow-wrap: anywhere; }
+th { background: #e2e8f0; }
+tr { page-break-inside: avoid; }
+.actions { margin-bottom: 20px; }
+button { padding: 10px 16px; cursor: pointer; }
+@media print {
+  body { margin: 10mm; }
+  .actions { display: none; }
+  thead { display: table-header-group; }
+}
+</style>
+</head>
+<body>
+<div class="actions"><button onclick="window.print()">Print / Save as PDF</button></div>
+<h1>WorkForce AI Pro â€” Attrition History</h1>
+<div class="subtitle">Generated: ${escapeHTML(reportDate)}</div>
+<div class="filters"><strong>Applied filters:</strong> ${escapeHTML(filterSummary.join(' | ') || 'None')}</div>
+<p>Total records: ${allRecords.length}</p>
+<table>
+<thead>
+<tr>
+<th>Prediction Date</th>
+<th>Employee ID</th>
+<th>Risk Level</th>
+<th>Probability</th>
+<th>Model Type</th>
+<th>Predicted By</th>
+</tr>

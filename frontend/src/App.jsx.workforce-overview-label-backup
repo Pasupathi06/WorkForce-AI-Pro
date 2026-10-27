@@ -1,0 +1,3419 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  LayoutDashboard, Users, Building2, BrainCircuit, ChartNoAxesCombined,
+  Settings, Search, Bell, ChevronDown, ArrowUpRight, ArrowDownRight,
+  UserPlus, CircleAlert, Menu, X, Download, CalendarDays,
+  BriefcaseBusiness, CircleCheck, TrendingUp, Sparkles, LogIn, LogOut,
+  Eye, EyeOff, LoaderCircle, RefreshCw, Pencil, Ban
+} from 'lucide-react'
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, PieChart, Pie, Cell
+} from 'recharts'
+import {
+  authAPI,
+  healthAPI,
+  employeeAPI,
+  departmentAPI,
+  attritionAPI,
+} from './api'
+import './App.css'
+
+const trendData = [
+  { month: 'May', employees: 104, attrition: 18 },
+  { month: 'Jun', employees: 112, attrition: 22 },
+  { month: 'Jul', employees: 108, attrition: 16 },
+  { month: 'Aug', employees: 125, attrition: 24 },
+  { month: 'Sep', employees: 121, attrition: 19 },
+  { month: 'Oct', employees: 138, attrition: 14 },
+  { month: 'Nov', employees: 146, attrition: 17 },
+]
+
+const demoDepartmentData = [
+  { name: 'Engineering', value: 42, color: '#6658e8' },
+  { name: 'Sales', value: 24, color: '#36b8a0' },
+  { name: 'Marketing', value: 18, color: '#f5a84b' },
+  { name: 'HR & Operations', value: 16, color: '#ef7193' },
+]
+
+const initialEmployees = [
+  { id: 'demo-1', name: 'Olivia Rhye', role: 'Product Designer', department: 'Design', risk: 'Low', score: 12, initials: 'OR', color: 'purple', demo: true },
+  { id: 'demo-2', name: 'Phoenix Baker', role: 'Software Engineer', department: 'Engineering', risk: 'High', score: 82, initials: 'PB', color: 'blue', demo: true },
+  { id: 'demo-3', name: 'Lana Steiner', role: 'HR Manager', department: 'Human Resources', risk: 'Low', score: 18, initials: 'LS', color: 'pink', demo: true },
+  { id: 'demo-4', name: 'Demi Wilkinson', role: 'Sales Executive', department: 'Sales', risk: 'Medium', score: 54, initials: 'DW', color: 'orange', demo: true },
+  { id: 'demo-5', name: 'Candice Wu', role: 'Data Analyst', department: 'Engineering', risk: 'High', score: 76, initials: 'CW', color: 'green', demo: true },
+]
+
+const navigation = [
+  { label: 'Overview', icon: LayoutDashboard },
+  { label: 'Employees', icon: Users },
+  { label: 'Departments', icon: Building2 },
+  { label: 'Attrition AI', icon: BrainCircuit },
+  { label: 'Analytics', icon: ChartNoAxesCombined },
+]
+
+const departmentColors = [
+  '#6658e8',
+  '#36b8a0',
+  '#f5a84b',
+  '#ef7193',
+  '#4b91e2',
+  '#9b6de3',
+]
+
+function getInitials(name = '') {
+  return name.trim().split(/\s+/).filter(Boolean)
+    .map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'U'
+}
+
+function getErrorMessage(error) {
+  const detail = error?.response?.data?.detail
+
+  if (typeof detail === 'string') return detail
+
+  if (Array.isArray(detail)) {
+    return detail.map((item) => item.msg).join(', ')
+  }
+
+  if (error?.response?.status === 401) {
+    return 'Session expire aagiyirukkalaam. Marubadi login pannunga.'
+  }
+
+  if (error?.response?.status === 403) {
+    return 'Indha action-ku ungaloda account role-ku permission illa. HR/Admin access thevai.'
+  }
+
+  if (error?.response?.status === 404) {
+    return 'Requested record kidaikkala.'
+  }
+
+  if (error?.response?.status === 409) {
+    return 'Indha record already exist aagudhu. Details check pannunga.'
+  }
+
+  if (error?.code === 'ECONNABORTED' || !error?.response) {
+    return 'Backend connect aagala. API server availability-ai check pannunga.'
+  }
+
+  return 'Request complete aagala. Details check panni marubadi try pannunga.'
+}
+
+function normalizeList(response) {
+  if (Array.isArray(response)) return response
+  if (Array.isArray(response?.items)) return response.items
+  if (Array.isArray(response?.results)) return response.results
+  if (Array.isArray(response?.data)) return response.data
+  return []
+}
+
+function AuthScreen({ onAuthenticated }) {
+  const [mode, setMode] = useState('login')
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [backendStatus, setBackendStatus] = useState('checking')
+
+  useEffect(() => {
+    let active = true
+
+    healthAPI.check()
+      .then(() => {
+        if (active) setBackendStatus('online')
+      })
+      .catch(() => {
+        if (active) setBackendStatus('offline')
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      if (mode === 'register') {
+        await authAPI.register({
+          full_name: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+        })
+
+        setMode('login')
+        setPassword('')
+        setFullName('')
+        setError('')
+
+        window.alert(
+          'Account create aagiduchu! Email and password use panni login pannunga. New account EMPLOYEE role-la create aagum.'
+        )
+      } else {
+        const result = await authAPI.login({
+          email: email.trim().toLowerCase(),
+          password,
+        })
+
+        if (!result?.access_token || !result?.user) {
+          throw new Error('Login response-la token/user details missing.')
+        }
+
+        onAuthenticated(result.user)
+      }
+    } catch (requestError) {
+      setError(
+        requestError.message === 'Login response-la token/user details missing.'
+          ? requestError.message
+          : getErrorMessage(requestError)
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="auth-screen">
+      <section className="auth-brand-panel">
+        <div className="auth-brand">
+          <div className="brand-mark"><BrainCircuit size={25} /></div>
+          <div>
+            <strong>WorkForce<span>AI</span></strong>
+            <small>PEOPLE INTELLIGENCE</small>
+          </div>
+        </div>
+
+        <div className="auth-brand-content">
+          <span className="eyebrow">WORKFORCE INTELLIGENCE PLATFORM</span>
+          <h1>Better workforce decisions start with better insights.</h1>
+          <p>
+            Manage employee information and explore responsible, data-driven
+            workforce intelligence in one workspace.
+          </p>
+
+          <div className="auth-feature">
+            <span><Users size={19} /></span>
+            <div>
+              <strong>Employee management</strong>
+              <small>Keep workforce information organised.</small>
+            </div>
+          </div>
+
+          <div className="auth-feature">
+            <span><BrainCircuit size={19} /></span>
+            <div>
+              <strong>Attrition intelligence</strong>
+              <small>Support HR teams with model-assisted insights.</small>
+            </div>
+          </div>
+
+          <div className="auth-feature">
+            <span><Building2 size={19} /></span>
+            <div>
+              <strong>Role-based access</strong>
+              <small>Access depends on your assigned account role.</small>
+            </div>
+          </div>
+        </div>
+
+        <div className="auth-brand-footer">© 2026 WorkForce AI Pro</div>
+      </section>
+
+      <section className="auth-form-panel">
+        <div className="auth-form-card">
+          <div className="auth-mobile-brand">
+            <div className="brand-mark"><BrainCircuit size={23} /></div>
+            <strong>WorkForce<span>AI</span></strong>
+          </div>
+
+          <div className="auth-form-heading">
+            <span className="greeting">
+              <Sparkles size={15} /> WELCOME TO YOUR WORKSPACE
+            </span>
+            <h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
+            <p>
+              {mode === 'login'
+                ? 'Enter your account details to continue.'
+                : 'Create an employee account to get started.'}
+            </p>
+          </div>
+
+          <div className={`backend-status ${backendStatus}`}>
+            <i />
+            {backendStatus === 'online'
+              ? 'Backend connection available'
+              : backendStatus === 'offline'
+                ? 'Backend connection unavailable'
+                : 'Checking backend connection...'}
+          </div>
+
+          {error && (
+            <div className="auth-error" role="alert">
+              <CircleAlert size={17} />
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            {mode === 'register' && (
+              <label className="auth-label">
+                Full name
+                <input
+                  autoComplete="name"
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
+                  placeholder="Enter your full name"
+                  minLength={2}
+                  maxLength={150}
+                  required
+                />
+              </label>
+            )}
+
+            <label className="auth-label">
+              Email address
+              <input
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@company.com"
+                required
+              />
+            </label>
+
+            <label className="auth-label">
+              Password
+              <div className="password-field">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Enter your password"
+                  minLength={mode === 'register' ? 8 : 1}
+                  maxLength={128}
+                  required
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowPassword((value) => !value)}
+                >
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
+
+              {mode === 'register' && (
+                <small className="field-hint">
+                  Password must contain at least 8 characters.
+                </small>
+              )}
+            </label>
+
+            <button type="submit" className="primary-button auth-submit" disabled={loading}>
+              {loading
+                ? <LoaderCircle className="spin-icon" size={17} />
+                : mode === 'login'
+                  ? <LogIn size={17} />
+                  : <UserPlus size={17} />}
+              {loading
+                ? 'Please wait...'
+                : mode === 'login'
+                  ? 'Sign in'
+                  : 'Create account'}
+            </button>
+          </form>
+
+          <div className="auth-switch">
+            {mode === 'login'
+              ? "Don't have an account?"
+              : 'Already have an account?'}
+
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === 'login' ? 'register' : 'login')
+                setError('')
+              }}
+            >
+              {mode === 'login' ? 'Create account' : 'Sign in'}
+            </button>
+          </div>
+
+          {mode === 'register' && (
+            <div className="auth-register-note">
+              <CircleAlert size={16} />
+              Public registration creates an EMPLOYEE account. HR/Admin
+              permissions must be assigned securely by an administrator.
+            </div>
+          )}
+
+          <p className="auth-security-note">
+            Secure session · JWT authentication · Role-based access
+          </p>
+        </div>
+      </section>
+    </main>
+  )
+}
+
+function App() {
+  const [user, setUser] = useState(() => authAPI.getStoredUser())
+  const [authenticated, setAuthenticated] = useState(() => authAPI.isAuthenticated())
+  const [activePage, setActivePage] = useState('Overview')
+  const [search, setSearch] = useState('')
+  const [mobileMenu, setMobileMenu] = useState(false)
+
+  // Live dashboard data from backend APIs.
+  const [dashboardData, setDashboardData] = useState({
+    loading: false,
+    error: '',
+    employeeCount: null,
+    highRiskPredictions: null,
+    departments: [],
+  })
+
+  const [employees, setEmployees] = useState(initialEmployees)
+  const [employeesLoading, setEmployeesLoading] = useState(false)
+  const [employeesError, setEmployeesError] = useState('')
+  const [employeesLoaded, setEmployeesLoaded] = useState(false)
+  const [employeePage, setEmployeePage] = useState(1)
+  const [employeeTotal, setEmployeeTotal] = useState(0)
+  const employeeRequestId = useRef(0)
+  const EMPLOYEES_PER_PAGE = 20
+
+  const [departments, setDepartments] = useState([])
+  const [departmentsLoading, setDepartmentsLoading] = useState(false)
+  const [departmentsError, setDepartmentsError] = useState('')
+  const [departmentsLoaded, setDepartmentsLoaded] = useState(false)
+  const [showAddDepartment, setShowAddDepartment] = useState(false)
+  const [newDepartment, setNewDepartment] = useState({
+    name: '',
+    description: '',
+  })
+  const [savingDepartment, setSavingDepartment] = useState(false)
+  const [editingDepartmentId, setEditingDepartmentId] = useState(null)
+  const [deactivatingDepartmentId, setDeactivatingDepartmentId] = useState(null)
+
+  const [showAdd, setShowAdd] = useState(false)
+  const [availableUsers, setAvailableUsers] = useState([])
+  const [availableUsersLoading, setAvailableUsersLoading] = useState(false)
+  const [newEmployee, setNewEmployee] = useState({
+    employee_code: '',
+    user_id: '',
+    department_id: '',
+    designation: '',
+    joining_date: '',
+    salary: '',
+    phone: '',
+  })
+  const [savingEmployee, setSavingEmployee] = useState(false)
+  const [notice, setNotice] = useState('')
+  const [loggingOut, setLoggingOut] = useState(false)
+
+  // Attrition prediction and model training state.
+  const [attritionForm, setAttritionForm] = useState({
+    Age: '30',
+    MonthlyIncome: '5000',
+    JobSatisfaction: '3',
+    WorkLifeBalance: '3',
+    YearsAtCompany: '5',
+    YearsInCurrentRole: '3',
+    YearsSinceLastPromotion: '1',
+    OverTime: '0',
+    BusinessTravel: 'Travel_Rarely',
+    Department: 'Research & Development',
+    JobRole: 'Research Scientist',
+    MaritalStatus: 'Single',
+  })
+  const [predictionResult, setPredictionResult] = useState(null)
+  const [predictingAttrition, setPredictingAttrition] = useState(false)
+  const [attritionError, setAttritionError] = useState('')
+  const [trainingModel, setTrainingModel] = useState(false)
+  const [trainingResult, setTrainingResult] = useState(null)
+  const [trainingError, setTrainingError] = useState('')
+
+  // Persisted attrition prediction history state.
+  const [attritionEmployeeId, setAttritionEmployeeId] = useState('')
+  const [historyItems, setHistoryItems] = useState([])
+  const [historyTotal, setHistoryTotal] = useState(0)
+  const [historyPage, setHistoryPage] = useState(1)
+  const [historyRiskFilter, setHistoryRiskFilter] = useState('')
+  const [historyEmployeeFilter, setHistoryEmployeeFilter] = useState('')
+
+  const [historyStartDateFilter, setHistoryStartDateFilter] = useState('')
+  const [historyEndDateFilter, setHistoryEndDateFilter] = useState('')
+  const [historyModelTypeFilter, setHistoryModelTypeFilter] = useState('')
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyError, setHistoryError] = useState('')
+  const historyPageSize = 10
+
+
+  useEffect(() => {
+    let active = true
+
+    if (!authAPI.isAuthenticated()) {
+      setAuthenticated(false)
+      setUser(null)
+      return () => {
+        active = false
+      }
+    }
+
+    authAPI.me()
+      .then((currentUser) => {
+        if (active) {
+          setUser(currentUser)
+          setAuthenticated(true)
+        }
+      })
+      .catch(() => {
+        if (active) {
+          authAPI.clearSession()
+          setUser(null)
+          setAuthenticated(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const role = String(user?.role || 'EMPLOYEE').toUpperCase()
+  const canManage = role === 'ADMIN' || role === 'HR'
+  const displayName = user?.full_name || user?.email || 'User'
+  const initials = getInitials(displayName)
+
+  function showNotice(message) {
+    setNotice(message)
+    window.setTimeout(() => setNotice(''), 4500)
+  }
+
+  function updateAttritionField(field, value) {
+    setAttritionForm((current) => ({
+      ...current,
+      [field]: value,
+    }))
+  }
+
+
+  async function loadAttritionHistory(page = historyPage, filterOverrides = {}) {
+    if (!canManage) return
+
+    setHistoryLoading(true)
+    setHistoryError('')
+
+    const params = {
+      page,
+      page_size: historyPageSize,
+    }
+
+    const riskFilter = filterOverrides.risk ?? historyRiskFilter
+    const startDateFilter = filterOverrides.startDate ?? historyStartDateFilter
+    const endDateFilter = filterOverrides.endDate ?? historyEndDateFilter
+    const modelTypeFilter = filterOverrides.modelType ?? historyModelTypeFilter
+    const employeeFilterValue = filterOverrides.employee ?? historyEmployeeFilter
+
+    if (riskFilter) params.risk_level = riskFilter
+    if (startDateFilter) params.start_date = startDateFilter
+    if (endDateFilter) params.end_date = endDateFilter
+    if (modelTypeFilter.trim()) params.model_type = modelTypeFilter.trim()
+
+    const employeeFilter = employeeFilterValue.trim()
+    if (employeeFilter) {
+      const employeeId = Number(employeeFilter)
+      if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        setHistoryError('Employee filter must be a positive integer ID.')
+        setHistoryLoading(false)
+        return
+      }
+      params.employee_id = employeeId
+    }
+
+    const validDate = (value) => {
+      if (!value) return true
+      const parsed = new Date(`${value}T00:00:00`)
+      return !Number.isNaN(parsed.getTime()) &&
+        parsed.toISOString().slice(0, 10) === value
+    }
+
+    if (!validDate(startDateFilter) || !validDate(endDateFilter)) {
+      setHistoryError('Please enter valid start and end dates.')
+      setHistoryLoading(false)
+      return
+    }
+
+    if (startDateFilter && endDateFilter && startDateFilter > endDateFilter) {
+      setHistoryError('Start date must be on or before end date.')
+      setHistoryLoading(false)
+      return
+    }
+
+    try {
+      const result = await attritionAPI.history(params)
+      setHistoryItems(Array.isArray(result.items) ? result.items : [])
+      setHistoryTotal(Number(result.total) || 0)
+      setHistoryPage(Number(result.page) || page)
+    } catch (error) {
+      const detail = error?.response?.data?.detail
+      const message = Array.isArray(detail)
+        ? detail.map((item) => item.msg || JSON.stringify(item)).join('; ')
+        : typeof detail === 'string'
+          ? detail
+          : error?.message || 'Unable to load prediction history.'
+
+      setHistoryError(message)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+
+  function applyAttritionHistoryFilters() {
+    setHistoryPage(1)
+
+    void loadAttritionHistory(1, {
+      employee: historyEmployeeFilter,
+      risk: historyRiskFilter,
+      startDate: historyStartDateFilter,
+      endDate: historyEndDateFilter,
+      modelType: historyModelTypeFilter,
+    })
+  }
+
+  function resetAttritionHistoryFilters() {
+    setHistoryEmployeeFilter('')
+    setHistoryRiskFilter('')
+    setHistoryStartDateFilter('')
+    setHistoryEndDateFilter('')
+    setHistoryModelTypeFilter('')
+    setHistoryPage(1)
+
+    void loadAttritionHistory(1, {
+      employee: '',
+      risk: '',
+      startDate: '',
+      endDate: '',
+      modelType: '',
+    })
+  }
+
+  async function exportAttritionHistoryPDF() {
+    if (!canManage) return
+
+    setHistoryError('')
+
+    const employeeFilter = historyEmployeeFilter.trim()
+    const riskFilter = historyRiskFilter
+    const startDateFilter = historyStartDateFilter
+    const endDateFilter = historyEndDateFilter
+    const modelTypeFilter = historyModelTypeFilter.trim()
+
+    if (
+      startDateFilter &&
+      endDateFilter &&
+      startDateFilter > endDateFilter
+    ) {
+      setHistoryError('Start date must be on or before end date.')
+      return
+    }
+
+    const params = {}
+
+    if (employeeFilter) {
+      const employeeId = Number(employeeFilter)
+
+      if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        setHistoryError('Employee filter must be a positive integer ID.')
+        return
+      }
+
+      params.employee_id = employeeId
+    }
+
+    if (riskFilter) params.risk_level = riskFilter
+    if (startDateFilter) params.start_date = startDateFilter
+    if (endDateFilter) params.end_date = endDateFilter
+    if (modelTypeFilter) params.model_type = modelTypeFilter
+
+    const filterSummary = [
+      employeeFilter ? `Employee ID: ${employeeFilter}` : '',
+      riskFilter ? `Risk Level: ${riskFilter}` : '',
+      startDateFilter ? `Start Date: ${startDateFilter}` : '',
+      endDateFilter ? `End Date: ${endDateFilter}` : '',
+      modelTypeFilter ? `Model Type: ${modelTypeFilter}` : '',
+    ].filter(Boolean)
+
+    const printWindow = window.open('', '_blank')
+
+    if (!printWindow) {
+      setHistoryError('Allow pop-ups in your browser to generate the PDF report.')
+      return
+    }
+
+    printWindow.document.open()
+    printWindow.document.write(
+      '<!DOCTYPE html><html><head><title>Attrition History Report</title></head>' +
+      '<body style="font-family:Arial,sans-serif;padding:24px">' +
+      '<h2>WorkForce AI Pro — Attrition History</h2>' +
+      '<p>Loading prediction history...</p></body></html>'
+    )
+    printWindow.document.close()
+
+    setHistoryLoading(true)
+
+    try {
+      const pageSize = 100
+      let page = 1
+      let total = 0
+      const allRecords = []
+      const maxPages = 10000
+
+      while (page <= maxPages) {
+        const result = await attritionAPI.history({
+          ...params,
+          page,
+          page_size: pageSize,
+        })
+
+        const items = Array.isArray(result.items) ? result.items : []
+        total = Number(result.total) || 0
+
+        if (items.length === 0) break
+
+        allRecords.push(...items)
+
+        if (allRecords.length >= total || items.length < pageSize) break
+
+        page += 1
+      }
+
+      if (page > maxPages) {
+        throw new Error('PDF export stopped because the pagination limit was reached.')
+      }
+
+      const escapeHTML = (value) =>
+        String(value ?? '').replace(/[&<>"']/g, (character) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[character])
+
+      const reportDate = new Date().toLocaleString()
+
+      const rowsHTML = allRecords.map((record) => {
+        const date = record.created_at
+          ? new Date(record.created_at).toLocaleString()
+          : ''
+
+        const employee = record.employee_id == null
+          ? 'General prediction'
+          : record.employee_id
+
+        const probability = record.attrition_risk_percentage ??
+          (record.attrition_probability == null
+            ? ''
+            : Number(record.attrition_probability) * 100)
+
+        const predictedBy = record.predicted_by_name ||
+          (record.predicted_by_user_id != null
+            ? `User #${record.predicted_by_user_id}`
+            : '')
+
+        return `<tr>
+          <td>${escapeHTML(date)}</td>
+          <td>${escapeHTML(employee)}</td>
+          <td>${escapeHTML(record.risk_level)}</td>
+          <td>${escapeHTML(probability === '' ? '' : Number(probability).toFixed(2) + '%')}</td>
+          <td>${escapeHTML(record.model_type)}</td>
+          <td>${escapeHTML(predictedBy)}</td>
+        </tr>`
+      }).join('')
+
+      const reportHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attrition History Report</title>
+<style>
+body { font-family: Arial, sans-serif; color: #1f2937; margin: 28px; }
+h1 { margin-bottom: 6px; font-size: 24px; }
+.subtitle { color: #64748b; margin-bottom: 20px; }
+.filters { padding: 12px; background: #f1f5f9; border-radius: 8px; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+th, td { border: 1px solid #dbe2ea; padding: 8px; text-align: left; overflow-wrap: anywhere; }
+th { background: #e2e8f0; }
+tr { page-break-inside: avoid; }
+.actions { margin-bottom: 20px; }
+button { padding: 10px 16px; cursor: pointer; }
+@media print {
+  body { margin: 10mm; }
+  .actions { display: none; }
+  thead { display: table-header-group; }
+}
+</style>
+</head>
+<body>
+<div class="actions"><button onclick="window.print()">Print / Save as PDF</button></div>
+<h1>WorkForce AI Pro — Attrition History</h1>
+<div class="subtitle">Generated: ${escapeHTML(reportDate)}</div>
+<div class="filters"><strong>Applied filters:</strong> ${escapeHTML(filterSummary.join(' | ') || 'None')}</div>
+<p>Total records: ${allRecords.length}</p>
+<table>
+<thead>
+<tr>
+<th>Prediction Date</th>
+<th>Employee ID</th>
+<th>Risk Level</th>
+<th>Probability</th>
+<th>Model Type</th>
+<th>Predicted By</th>
+</tr>
+</thead>
+<tbody>${rowsHTML || '<tr><td colspan="6">No matching prediction history records.</td></tr>'}</tbody>
+</table>
+</body>
+</html>`
+
+      if (!printWindow.closed) {
+        printWindow.document.open()
+        printWindow.document.write(reportHTML)
+        printWindow.document.close()
+      }
+    } catch (error) {
+      if (!printWindow.closed) {
+        printWindow.document.open()
+        printWindow.document.write(
+          '<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;padding:24px">' +
+          '<h2>Unable to generate attrition history report</h2>' +
+          '<p>Please return to WorkForce AI Pro, sign in again if needed, and retry.</p>' +
+          '</body></html>'
+        )
+        printWindow.document.close()
+      }
+
+      setHistoryError(
+        error?.response?.data?.detail ||
+        error?.message ||
+        'Unable to generate the PDF report.'
+      )
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+async function exportAttritionHistoryCSV() {
+    if (!canManage) return
+
+    setHistoryError('')
+
+    const params = {}
+    const employeeFilter = historyEmployeeFilter.trim()
+    const riskFilter = historyRiskFilter
+    const startDateFilter = historyStartDateFilter
+    const endDateFilter = historyEndDateFilter
+    const modelTypeFilter = historyModelTypeFilter.trim()
+
+    if (employeeFilter) {
+      const employeeId = Number(employeeFilter)
+
+      if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        setHistoryError('Employee filter must be a positive integer ID.')
+        return
+      }
+
+      params.employee_id = employeeId
+    }
+
+    if (riskFilter) params.risk_level = riskFilter
+    if (startDateFilter) params.start_date = startDateFilter
+    if (endDateFilter) params.end_date = endDateFilter
+    if (modelTypeFilter) params.model_type = modelTypeFilter
+
+    const validDate = (value) => {
+      if (!value) return true
+      const parsed = new Date(`${value}T00:00:00`)
+
+      return (
+        !Number.isNaN(parsed.getTime()) &&
+        parsed.toISOString().slice(0, 10) === value
+      )
+    }
+
+    if (!validDate(startDateFilter) || !validDate(endDateFilter)) {
+      setHistoryError('Please enter valid start and end dates.')
+      return
+    }
+
+    if (startDateFilter && endDateFilter && startDateFilter > endDateFilter) {
+      setHistoryError('Start date must be on or before end date.')
+      return
+    }
+
+    setHistoryLoading(true)
+
+    try {
+      const pageSize = 100
+      let page = 1
+      let total = 0
+      const records = []
+      const maxPages = 10000
+
+      while (page <= maxPages) {
+        const result = await attritionAPI.history({
+          ...params,
+          page,
+          page_size: pageSize,
+        })
+
+        const items = Array.isArray(result.items) ? result.items : []
+        total = Number(result.total) || 0
+
+        if (items.length === 0) break
+
+        records.push(...items)
+
+        if (records.length >= total || items.length < pageSize) break
+
+        page += 1
+      }
+
+      if (page > maxPages) {
+        throw new Error('Export stopped because the pagination limit was reached.')
+      }
+
+      if (records.length === 0) {
+        setHistoryError('No prediction history records available to export.')
+        return
+      }
+
+      const columns = [
+        ['Prediction Date', 'created_at'],
+        ['Employee ID', 'employee_id'],
+        ['Risk Level', 'risk_level'],
+        ['Attrition Probability', 'attrition_probability'],
+        ['Attrition Risk Percentage', 'attrition_risk_percentage'],
+        ['Model Type', 'model_type'],
+        ['Predicted By', 'predicted_by_name'],
+        ['Predicted By User ID', 'predicted_by_user_id'],
+      ]
+
+      const escapeCSV = (value) => {
+        let text = value == null ? '' : String(value)
+
+        if (/^[\s]*[=+\-@]/.test(text)) {
+          text = "'" + text
+        }
+
+        return '"' + text.replace(/"/g, '""') + '"'
+      }
+
+      const csvRows = [
+        columns.map(([label]) => escapeCSV(label)).join(','),
+        ...records.map((record) =>
+          columns.map(([, key]) => {
+            let value = record[key]
+
+            if (key === 'created_at' && value) {
+              const parsedDate = new Date(value)
+              value = Number.isNaN(parsedDate.getTime())
+                ? value
+                : parsedDate.toISOString()
+            }
+
+            if (key === 'employee_id' && value == null) {
+              value = 'General prediction'
+            }
+
+            if (
+              key === 'predicted_by_name' &&
+              !value &&
+              record.predicted_by_user_id != null
+            ) {
+              value = `User #${record.predicted_by_user_id}`
+            }
+
+            return escapeCSV(value)
+          }).join(',')
+        ),
+      ]
+
+      const csvContent = '\uFEFF' + csvRows.join('\r\n')
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;',
+      })
+
+      const downloadUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+
+      link.href = downloadUrl
+      link.download = `attrition-history-${new Date().toISOString().slice(0, 10)}.csv`
+
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
+    } catch (error) {
+      const detail = error?.response?.data?.detail
+
+      const message =
+        typeof detail === 'string'
+          ? detail
+          : error?.message || 'Unable to export prediction history.'
+
+      setHistoryError(message)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+  useEffect(() => {
+    if (activePage === 'Attrition AI' && canManage) {
+      void loadAttritionHistory(historyPage)
+    }
+  }, [activePage, canManage])
+
+  async function handleAttritionPredict(event) {
+    event.preventDefault()
+
+    if (!canManage) {
+      setAttritionError('HR or Admin permission is required.')
+      return
+    }
+
+    setPredictingAttrition(true)
+    setAttritionError('')
+    setPredictionResult(null)
+
+    const payload = {
+      ...attritionForm,
+      Age: Number(attritionForm.Age),
+      MonthlyIncome: Number(attritionForm.MonthlyIncome),
+      JobSatisfaction: Number(attritionForm.JobSatisfaction),
+      WorkLifeBalance: Number(attritionForm.WorkLifeBalance),
+      YearsAtCompany: Number(attritionForm.YearsAtCompany),
+      YearsInCurrentRole: Number(attritionForm.YearsInCurrentRole),
+      YearsSinceLastPromotion: Number(
+        attritionForm.YearsSinceLastPromotion
+      ),
+      OverTime: Number(attritionForm.OverTime),
+    }
+
+    if (attritionEmployeeId.trim()) {
+      const employeeId = Number(attritionEmployeeId.trim())
+      if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        setAttritionError('Employee ID must be a positive integer.')
+        setPredictingAttrition(false)
+        return
+      }
+      payload.employee_id = employeeId
+    }
+
+    try {
+      const result = await attritionAPI.predict(payload)
+      setPredictionResult(result)
+      await loadAttritionHistory(1)
+    } catch (error) {
+      const detail = error?.response?.data?.detail
+      const message = Array.isArray(detail)
+        ? detail.map((item) => item.msg || JSON.stringify(item)).join('; ')
+        : typeof detail === 'string'
+          ? detail
+          : error?.message || 'Unable to get an attrition prediction.'
+
+      setAttritionError(message)
+    } finally {
+      setPredictingAttrition(false)
+    }
+  }
+
+  async function handleTrainModel() {
+    if (role !== 'ADMIN') {
+      setTrainingError('Only an Admin can train the attrition model.')
+      return
+    }
+
+    setTrainingModel(true)
+    setTrainingError('')
+    setTrainingResult(null)
+
+    try {
+      const result = await attritionAPI.train()
+      setTrainingResult(result)
+      showNotice('Attrition model training completed successfully.')
+    } catch (error) {
+      const detail = error?.response?.data?.detail
+      const message = Array.isArray(detail)
+        ? detail.map((item) => item.msg || JSON.stringify(item)).join('; ')
+        : typeof detail === 'string'
+          ? detail
+          : error?.message || 'Unable to train the attrition model.'
+
+      setTrainingError(message)
+    } finally {
+      setTrainingModel(false)
+    }
+  }
+
+  function handleAuthenticated(loggedInUser) {
+    setUser(loggedInUser)
+    setAuthenticated(true)
+    setActivePage('Overview')
+  }
+
+  async function handleLogout() {
+    setLoggingOut(true)
+
+    try {
+      await authAPI.logout()
+    } catch {
+      authAPI.clearSession()
+    } finally {
+      setUser(null)
+      setAuthenticated(false)
+      setActivePage('Overview')
+      setEmployeesLoaded(false)
+      setDepartmentsLoaded(false)
+      setLoggingOut(false)
+    }
+  }
+
+  async function loadEmployees() {
+    const requestId = ++employeeRequestId.current
+
+    if (!canManage) {
+      setEmployeesError('Employee directory access-ku HR/Admin permission thevai.')
+      setEmployeesLoaded(false)
+      setEmployees([])
+      setEmployeeTotal(0)
+      return
+    }
+
+    setEmployeesLoading(true)
+    setEmployeesError('')
+
+    try {
+      const params = {
+        page: employeePage,
+        page_size: EMPLOYEES_PER_PAGE,
+        active_only: true,
+        search: search.trim() || undefined,
+      }
+
+      const response = await employeeAPI.list(params)
+
+      if (requestId !== employeeRequestId.current) return
+
+      const records = normalizeList(response)
+
+      setEmployees(records.map((employee) => ({
+        id: employee.id,
+        employee_code: employee.employee_code || `EMP-${employee.id}`,
+        user_id: employee.user_id,
+        name: employee.full_name || employee.employee_code || `Employee ${employee.id}`,
+        email: employee.email || '',
+        role: employee.designation || 'Designation not set',
+        department_id: employee.department_id,
+        department_name: employee.department_name || '',
+        department: employee.department_name || (
+          employee.department_id
+            ? `Department ID ${employee.department_id}`
+            : 'Not assigned'
+        ),
+        risk: 'Unavailable',
+        score: null,
+        initials: getInitials(employee.employee_code || `E${employee.id}`),
+        color: 'purple',
+        demo: false,
+        is_active: employee.is_active,
+        joining_date: employee.joining_date,
+        salary: employee.salary,
+        phone: employee.phone,
+      })))
+
+      setEmployeesLoaded(true)
+
+      try {
+        const countResponse = await employeeAPI.count({
+          active_only: true,
+          search: search.trim() || undefined,
+        })
+
+        if (requestId !== employeeRequestId.current) return
+
+        const total = Number(countResponse?.count)
+
+        if (Number.isFinite(total) && total >= 0) {
+          setEmployeeTotal(total)
+        }
+      } catch {
+        if (requestId === employeeRequestId.current) {
+          setEmployeeTotal((employeePage - 1) * EMPLOYEES_PER_PAGE + records.length)
+        }
+      }
+    } catch (error) {
+      if (requestId === employeeRequestId.current) {
+        setEmployeesError(getErrorMessage(error))
+        setEmployeesLoaded(false)
+      }
+    } finally {
+      if (requestId === employeeRequestId.current) {
+        setEmployeesLoading(false)
+      }
+    }
+  }
+  async function loadDepartments() {
+    if (!canManage) {
+      setDepartmentsError('Department directory access-ku HR/Admin permission thevai.')
+      setDepartmentsLoaded(false)
+      setDepartments([])
+      return
+    }
+
+    setDepartmentsLoading(true)
+    setDepartmentsError('')
+
+    try {
+      const response = await departmentAPI.list({ include_inactive: false })
+      const records = normalizeList(response)
+
+      setDepartments(records.map((department, index) => ({
+        ...department,
+        color: departmentColors[index % departmentColors.length],
+      })))
+
+      setDepartmentsLoaded(true)
+    } catch (error) {
+      setDepartmentsError(getErrorMessage(error))
+      setDepartmentsLoaded(false)
+    } finally {
+      setDepartmentsLoading(false)
+    }
+  }
+
+  function handleEditDepartment(department) {
+  setEditingDepartmentId(department.id)
+  setNewDepartment({
+    name: department.name || '',
+    description: department.description || '',
+  })
+  setShowAddDepartment(true)
+}
+
+async function handleUpdateDepartment(event) {
+  event.preventDefault()
+
+  if (!editingDepartmentId) return
+
+  const name = newDepartment.name.trim()
+  const description = newDepartment.description.trim()
+
+  if (name.length < 2) {
+    showNotice('Department name must contain at least 2 characters.')
+    return
+  }
+
+  setSavingDepartment(true)
+
+  try {
+    await departmentAPI.update(editingDepartmentId, {
+      name,
+      description: description || undefined,
+    })
+
+    setEditingDepartmentId(null)
+    setNewDepartment({ name: '', description: '' })
+    setShowAddDepartment(false)
+    showNotice('Department updated successfully.')
+    await loadDepartments()
+  } catch (error) {
+    showNotice(getErrorMessage(error))
+  } finally {
+    setSavingDepartment(false)
+  }
+}
+
+  async function loadDashboardData() {
+    if (!canManage) {
+      setDashboardData({
+        loading: false,
+        error: 'Dashboard analytics require HR or Admin access.',
+        employeeCount: null,
+        highRiskPredictions: null,
+        departments: [],
+      })
+      return
+    }
+
+    setDashboardData((current) => ({
+      ...current,
+      loading: true,
+      error: '',
+    }))
+
+    try {
+      const [countResult, historyResult, departmentResult] =
+        await Promise.allSettled([
+          employeeAPI.count({ active_only: true }),
+          attritionAPI.history({ page: 1, page_size: 1, risk_level: 'HIGH' }),
+          departmentAPI.list({ include_inactive: false }),
+        ])
+
+      let employeeCount = null
+      let highRiskPredictions = null
+      let departmentRecords = []
+      const issues = []
+
+      if (countResult.status === 'fulfilled') {
+        const count = Number(countResult.value?.count)
+        if (Number.isFinite(count) && count >= 0) {
+          employeeCount = count
+        } else {
+          issues.push('Employee count returned an invalid response.')
+        }
+      } else {
+        issues.push('Employee count could not be loaded.')
+      }
+
+      if (historyResult.status === 'fulfilled') {
+        const total = Number(historyResult.value?.total)
+        if (Number.isFinite(total) && total >= 0) {
+          highRiskPredictions = total
+        } else {
+          issues.push('High-risk prediction history returned an invalid response.')
+        }
+      } else {
+        issues.push('High-risk prediction history could not be loaded.')
+      }
+
+      if (departmentResult.status === 'fulfilled') {
+        departmentRecords = normalizeList(departmentResult.value)
+      } else {
+        issues.push('Department list could not be loaded.')
+      }
+
+      const departmentsWithCounts = await Promise.all(
+        departmentRecords.map(async (department, index) => {
+          const color = departmentColors[index % departmentColors.length]
+
+          try {
+            const response = await employeeAPI.count({
+              department_id: department.id,
+              active_only: true,
+            })
+            const count = Number(response?.count)
+
+            if (!Number.isFinite(count) || count < 0) {
+              issues.push(
+                `Employee count is invalid for ${department.name || 'a department'}.`
+              )
+              return {
+                id: department.id,
+                name: department.name || 'Unnamed department',
+                value: null,
+                color,
+              }
+            }
+
+            return {
+              id: department.id,
+              name: department.name || 'Unnamed department',
+              value: count,
+              color,
+            }
+          } catch {
+            issues.push(
+              `Employee count could not be loaded for ${department.name || 'a department'}.`
+            )
+            return {
+              id: department.id,
+              name: department.name || 'Unnamed department',
+              value: null,
+              color,
+            }
+          }
+        })
+      )
+
+      setDashboardData({
+        loading: false,
+        error: issues.length > 0 ? issues.join(' ') : '',
+        employeeCount,
+        highRiskPredictions,
+        departments: departmentsWithCounts,
+      })
+    } catch (error) {
+      setDashboardData((current) => ({
+        ...current,
+        loading: false,
+        error: getErrorMessage(error) || 'Unable to load dashboard data.',
+      }))
+    }
+  }async function handleDeactivateDepartment(department) {
+  const confirmed = window.confirm(
+    `Deactivate the "${department.name}" department? This action may affect related records.`
+  )
+
+  if (!confirmed) return
+
+  setDeactivatingDepartmentId(department.id)
+
+  try {
+    await departmentAPI.deactivate(department.id)
+    showNotice('Department deactivated successfully.')
+    await loadDepartments()
+  } catch (error) {
+    showNotice(getErrorMessage(error))
+  } finally {
+    setDeactivatingDepartmentId(null)
+  }
+}
+
+async function handleCreateDepartment(event) {
+    event.preventDefault()
+
+    const name = newDepartment.name.trim()
+    const description = newDepartment.description.trim()
+
+    if (!name) {
+      showNotice('Department name is required.')
+      return
+    }
+
+    if (name.length < 2) {
+      showNotice('Department name must contain at least 2 characters.')
+      return
+    }
+
+    setSavingDepartment(true)
+
+    try {
+      await departmentAPI.create({
+        name,
+        description: description || undefined,
+      })
+
+      setNewDepartment({ name: '', description: '' })
+      setShowAddDepartment(false)
+      showNotice('Department created successfully.')
+      await loadDepartments()
+    } catch (error) {
+      showNotice(getErrorMessage(error))
+    } finally {
+      setSavingDepartment(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!authenticated || !canManage || activePage !== 'Employees') return
+
+    const timer = window.setTimeout(() => {
+      loadEmployees()
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timer)
+      employeeRequestId.current += 1
+    }
+  }, [authenticated, canManage, activePage, search, employeePage])
+
+  useEffect(() => {
+    if (!authenticated || !canManage || activePage !== 'Departments') return
+    loadDepartments()
+  }, [authenticated, canManage, activePage])
+
+  /* employee-pagination-page-clamp */
+useEffect(() => {
+  const totalPages = Math.max(
+    1,
+    Math.ceil(employeeTotal / EMPLOYEES_PER_PAGE)
+  )
+
+  if (employeePage > totalPages) {
+    setEmployeePage(totalPages)
+  }
+}, [employeeTotal, employeePage])
+const filteredEmployees = employees
+
+  function updateEmployeeField(event) {
+    const { name, value } = event.target
+
+    setNewEmployee((previous) => ({
+      ...previous,
+      [name]: value,
+    }))
+  }
+
+  async function loadAvailableUsers() {
+    if (!canManage) return
+
+    setAvailableUsersLoading(true)
+
+    try {
+      const response = await authAPI.availableEmployeeUsers()
+      setAvailableUsers(normalizeList(response))
+    } catch (error) {
+      setAvailableUsers([])
+      showNotice(getErrorMessage(error))
+    } finally {
+      setAvailableUsersLoading(false)
+    }
+  }
+
+  async function addEmployee(event) {
+    event.preventDefault()
+
+    if (!canManage) {
+      showNotice('Employee create panna HR/Admin permission thevai.')
+      return
+    }
+
+    if (
+      !newEmployee.employee_code.trim() ||
+      !newEmployee.user_id ||
+      !newEmployee.designation.trim() ||
+      !newEmployee.joining_date
+    ) {
+      showNotice('Required employee details ellam fill pannunga.')
+      return
+    }
+
+    setSavingEmployee(true)
+
+    try {
+      const payload = {
+        employee_code: newEmployee.employee_code.trim(),
+        user_id: Number(newEmployee.user_id),
+        designation: newEmployee.designation.trim(),
+        joining_date: newEmployee.joining_date,
+        salary: newEmployee.salary === '' ? 0 : Number(newEmployee.salary),
+        phone: newEmployee.phone.trim() || null,
+      }
+
+      if (newEmployee.department_id) {
+        payload.department_id = Number(newEmployee.department_id)
+      }
+
+      await employeeAPI.create(payload)
+
+      setShowAdd(false)
+      setNewEmployee({
+        employee_code: '',
+        user_id: '',
+        department_id: '',
+        designation: '',
+        joining_date: '',
+        salary: '',
+        phone: '',
+      })
+
+      showNotice('Employee record backend-la create aagiduchu.')
+      await loadEmployees()
+    } catch (error) {
+      showNotice(getErrorMessage(error))
+    } finally {
+      setSavingEmployee(false)
+    }
+  }
+
+  const demoEmployees = employeesLoaded ? [] : initialEmployees
+  const highRiskCount = initialEmployees.filter((employee) => employee.risk === 'High').length
+
+  if (!authenticated) {
+    return <AuthScreen onAuthenticated={handleAuthenticated} />
+  }
+
+  function renderContent() {
+    if (activePage === 'Employees') {
+      return (
+        <section className="panel employee-full-panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Employee directory</h2>
+              <p>
+                {employeesLoaded
+                  ? `${employeeTotal} active employee record(s) from the backend.`
+                  : 'Employee information is loaded from the workforce API.'}
+              </p>
+            </div>
+
+            <div className="heading-actions">
+              <button
+                className="subtle-button"
+                onClick={loadEmployees}
+                disabled={employeesLoading}
+              >
+                <RefreshCw size={15} />
+                Refresh
+              </button>
+
+              {canManage && (
+                <button className="primary-button" onClick={() => { setShowAdd(true); loadAvailableUsers(); loadDepartments() }}>
+                  <UserPlus size={17} />
+                  Add employee
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="search-box table-search">
+            <Search size={17} />
+            <input
+              value={search}
+              onChange={(event) => {
+                setEmployeePage(1)
+                setSearch(event.target.value)
+              }}
+              placeholder="Search by name, email, employee code, or designation..."
+            />
+          </div>
+
+          {employeesLoading && (
+            <div className="empty-state">
+              <LoaderCircle className="spin-icon" size={20} />
+              Loading employee records...
+            </div>
+          )}
+
+          {!employeesLoading && employeesError && (
+            <div className="notice-box">
+              <CircleAlert size={17} />
+              <span>{employeesError}</span>
+              <button className="text-button" onClick={loadEmployees}>Retry</button>
+            </div>
+          )}
+
+          {!employeesLoading && !employeesError && employeesLoaded && (
+            <>
+              <EmployeeTable employees={filteredEmployees} />
+              <div className="employee-pagination">
+                <p className="pagination-summary">
+                  {employeeTotal === 0
+                    ? 'Showing 0 of 0 employees'
+                    : `Showing ${((employeePage - 1) * EMPLOYEES_PER_PAGE) + 1}–${Math.min(employeePage * EMPLOYEES_PER_PAGE, employeeTotal)} of ${employeeTotal} employees`}
+                </p>
+
+                <div className="pagination-controls">
+                  <button
+                    type="button"
+                    className="subtle-button"
+                    onClick={() => setEmployeePage((page) => Math.max(1, page - 1))}
+                    disabled={employeesLoading || employeePage <= 1}
+                  >
+                    Previous
+                  </button>
+
+                  <span className="pagination-page">
+                    Page {employeePage} of {Math.max(1, Math.ceil(employeeTotal / EMPLOYEES_PER_PAGE))}
+                  </span>
+
+                  <button
+                    type="button"
+                    className="subtle-button"
+                    onClick={() => setEmployeePage((page) => page + 1)}
+                    disabled={
+                      employeesLoading ||
+                      employeePage >= Math.max(1, Math.ceil(employeeTotal / EMPLOYEES_PER_PAGE))
+                    }
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+              <div className="notice-box">
+                <CircleCheck size={17} />
+                Employee information is loaded from the backend. Attrition risk is
+                not calculated by the employee-list endpoint.
+              </div>
+            </>
+          )}
+
+          {!employeesLoading && !employeesError && !employeesLoaded && (
+            <div className="notice-box">
+              <CircleAlert size={17} />
+              Employee API data innum load aagala. Refresh button use pannunga.
+            </div>
+          )}
+        </section>
+      )
+    }
+
+    if (activePage === 'Departments') {
+      return (
+        <section className="department-grid">
+          <div className="department-page-heading">
+            <div>
+              <h2>Department directory</h2>
+              <p>Manage your organisation's departments using live backend data.</p>
+            </div>
+
+            <div className="department-actions">
+              <button
+                className="subtle-button"
+                onClick={loadDepartments}
+                disabled={departmentsLoading || savingDepartment}
+              >
+                <RefreshCw size={15} />
+                Refresh
+              </button>
+
+              {canManage && (
+                <button
+                  className="primary-button"
+                  onClick={() => { if (showAddDepartment) { setEditingDepartmentId(null); setNewDepartment({ name: '', description: '' }) }; setShowAddDepartment((previous) => !previous) }}
+                  disabled={savingDepartment}
+                >
+                  <Building2 size={16} />
+                  {showAddDepartment ? 'Close Form' : 'Add Department'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {showAddDepartment && canManage && (
+            <form className="panel department-form" onSubmit={editingDepartmentId ? handleUpdateDepartment : handleCreateDepartment}>
+              <div className="panel-heading">
+                <div>
+                  <h2>{editingDepartmentId ? 'Edit department' : 'Create department'}</h2>
+                  <p>{editingDepartmentId ? 'Update the department details below.' : 'Add a new department to your organisation.'}</p>
+                </div>
+                <Building2 size={22} />
+              </div>
+
+              <div className="department-form-fields">
+                <label className="auth-label">
+                  Department name <span aria-hidden="true">*</span>
+                  <input
+                    className="auth-input"
+                    type="text"
+                    name="name"
+                    placeholder="e.g. Engineering"
+                    minLength={2}
+                    maxLength={100}
+                    value={newDepartment.name}
+                    onChange={(event) => setNewDepartment((previous) => ({
+                      ...previous,
+                      name: event.target.value,
+                    }))}
+                    required
+                    disabled={savingDepartment}
+                  />
+                </label>
+
+                <label className="auth-label">
+                  Description
+                  <textarea
+                    className="auth-input department-description-input"
+                    name="description"
+                    placeholder="Describe this department (optional)"
+                    maxLength={2000}
+                    rows={3}
+                    value={newDepartment.description}
+                    onChange={(event) => setNewDepartment((previous) => ({
+                      ...previous,
+                      description: event.target.value,
+                    }))}
+                    disabled={savingDepartment}
+                  />
+                </label>
+              </div>
+
+              <div className="department-form-actions">
+                <button
+                  className="subtle-button"
+                  type="button"
+                  onClick={() => {
+                    setShowAddDepartment(false)
+                    setEditingDepartmentId(null)
+                    setNewDepartment({ name: '', description: '' })
+                  }}
+                  disabled={savingDepartment}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="primary-button"
+                  type="submit"
+                  disabled={savingDepartment || !newDepartment.name.trim()}
+                >
+                  {savingDepartment ? (
+                    <>
+                      <LoaderCircle className="spin-icon" size={16} />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CircleCheck size={16} />
+                      {editingDepartmentId ? 'Update Department' : 'Save Department'}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {departmentsLoading && (
+            <div className="panel empty-state">
+              <LoaderCircle className="spin-icon" size={20} />
+              Loading departments...
+            </div>
+          )}
+
+          {!departmentsLoading && departmentsError && (
+            <div className="notice-box">
+              <CircleAlert size={17} />
+              <span>{departmentsError}</span>
+              <button className="text-button" onClick={loadDepartments}>Retry</button>
+            </div>
+          )}
+
+          {!departmentsLoading && !departmentsError && departmentsLoaded && (
+            departments.length ? (
+              departments.map((department) => (
+                <article className="panel department-card" key={department.id}>
+                  <div
+                    className="department-icon"
+                    style={{
+                      background: `${department.color}18`,
+                      color: department.color,
+                    }}
+                  >
+                    <Building2 size={23} />
+                  </div>
+
+                  <span className="department-label">Live department</span>
+                  <h2>{department.name}</h2>
+
+                  <div className="department-total">
+                    #{department.id}
+                    <span>department ID</span>
+                  </div>
+
+                  <p>{department.description || 'No description provided.'}</p>
+
+                  <div className="active-status">
+                    <i />
+                    {department.is_active ? 'Active' : 'Inactive'}
+                  </div>
+
+                  {canManage && department.is_active && (
+                    <div className="department-card-actions">
+                      <button
+                        type="button"
+                        className="subtle-button"
+                        onClick={() => handleEditDepartment(department)}
+                        disabled={savingDepartment || deactivatingDepartmentId !== null}
+                      >
+                        <Pencil size={15} />
+                        Edit
+                      </button>
+
+                      {role === 'ADMIN' && (
+                        <button
+                          type="button"
+                          className="department-deactivate-button"
+                          onClick={() => handleDeactivateDepartment(department)}
+                          disabled={savingDepartment || deactivatingDepartmentId === department.id}
+                        >
+                          {deactivatingDepartmentId === department.id ? (
+                            <LoaderCircle className="spin-icon" size={15} />
+                          ) : (
+                            <Ban size={15} />
+                          )}
+                          {deactivatingDepartmentId === department.id ? 'Deactivating...' : 'Deactivate'}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </article>
+              ))
+            ) : (
+              <div className="panel empty-state">
+                No active departments found in the backend.
+              </div>
+            )
+          )}
+        </section>
+      )
+    }
+
+    if (activePage === 'Attrition AI') {
+      const riskLevel = String(
+        predictionResult?.risk_level || ''
+      ).toUpperCase()
+
+      const riskClass = ['LOW', 'MEDIUM', 'HIGH'].includes(riskLevel)
+        ? `risk-${riskLevel.toLowerCase()}`
+        : ''
+
+      return (
+        <section className="ai-page">
+          <div className="ai-hero panel">
+            <div className="ai-icon">
+              <BrainCircuit size={29} />
+            </div>
+            <span className="eyebrow">WORKFORCE INTELLIGENCE</span>
+            <h2>Understand attrition before it happens.</h2>
+            <p>
+              Use workforce signals to identify potential retention risks
+              and help managers plan supportive interventions.
+            </p>
+
+            <div className="ai-stats">
+              <div>
+                <strong>{highRiskCount}</strong>
+                <span>High-risk demo profiles</span>
+              </div>
+              <div>
+                <strong>12</strong>
+                <span>Model input fields</span>
+              </div>
+              <div>
+                <strong>AI</strong>
+                <span>Prediction service</span>
+              </div>
+            </div>
+          </div>
+
+          {canManage ? (
+            <div className="panel attrition-panel">
+              <div className="panel-heading">
+                <div>
+                  <h2>Employee attrition prediction</h2>
+                  <p>
+                    Enter workforce details to request a prediction from
+                    the backend model.
+                  </p>
+                </div>
+                <BrainCircuit size={22} color="#7667e8" />
+              </div>
+
+              <form
+                className="attrition-form"
+                onSubmit={handleAttritionPredict}
+              >
+                <div className="attrition-form-grid">
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-employee-id">
+                      Employee ID (optional)
+                    </label>
+                    <input
+                      id="attrition-employee-id"
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="Leave blank for a general prediction"
+                      value={attritionEmployeeId}
+                      onChange={(event) => setAttritionEmployeeId(event.target.value)}
+                    />
+                    <small>
+                      Enter an existing employee ID to link this prediction
+                      to that employee.
+                    </small>
+                  </div>
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-age">Age</label>
+                    <input
+                      id="attrition-age"
+                      type="number"
+                      min="18"
+                      max="100"
+                      required
+                      value={attritionForm.Age}
+                      onChange={(event) =>
+                        updateAttritionField('Age', event.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-income">Monthly income</label>
+                    <input
+                      id="attrition-income"
+                      type="number"
+                      min="0"
+                      max="100000000"
+                      step="any"
+                      required
+                      value={attritionForm.MonthlyIncome}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'MonthlyIncome',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-satisfaction">
+                      Job satisfaction
+                    </label>
+                    <select
+                      id="attrition-satisfaction"
+                      value={attritionForm.JobSatisfaction}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'JobSatisfaction',
+                          event.target.value
+                        )
+                      }
+                    >
+                      <option value="1">1 - Low</option>
+                      <option value="2">2 - Medium</option>
+                      <option value="3">3 - High</option>
+                      <option value="4">4 - Very high</option>
+                    </select>
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-worklife">
+                      Work-life balance
+                    </label>
+                    <select
+                      id="attrition-worklife"
+                      value={attritionForm.WorkLifeBalance}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'WorkLifeBalance',
+                          event.target.value
+                        )
+                      }
+                    >
+                      <option value="1">1 - Poor</option>
+                      <option value="2">2 - Fair</option>
+                      <option value="3">3 - Good</option>
+                      <option value="4">4 - Excellent</option>
+                    </select>
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-company-years">
+                      Years at company
+                    </label>
+                    <input
+                      id="attrition-company-years"
+                      type="number"
+                      min="0"
+                      max="80"
+                      required
+                      value={attritionForm.YearsAtCompany}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'YearsAtCompany',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-role-years">
+                      Years in current role
+                    </label>
+                    <input
+                      id="attrition-role-years"
+                      type="number"
+                      min="0"
+                      max={attritionForm.YearsAtCompany || 80}
+                      required
+                      value={attritionForm.YearsInCurrentRole}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'YearsInCurrentRole',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-promotion-years">
+                      Years since last promotion
+                    </label>
+                    <input
+                      id="attrition-promotion-years"
+                      type="number"
+                      min="0"
+                      max={attritionForm.YearsAtCompany || 80}
+                      required
+                      value={attritionForm.YearsSinceLastPromotion}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'YearsSinceLastPromotion',
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-overtime">Overtime</label>
+                    <select
+                      id="attrition-overtime"
+                      value={attritionForm.OverTime}
+                      onChange={(event) =>
+                        updateAttritionField('OverTime', event.target.value)
+                      }
+                    >
+                      <option value="0">No</option>
+                      <option value="1">Yes</option>
+                    </select>
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-travel">Business travel</label>
+                    <select
+                      id="attrition-travel"
+                      value={attritionForm.BusinessTravel}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'BusinessTravel',
+                          event.target.value
+                        )
+                      }
+                    >
+                      <option value="Non-Travel">Non-Travel</option>
+                      <option value="Travel_Rarely">Travel Rarely</option>
+                      <option value="Travel_Frequently">
+                        Travel Frequently
+                      </option>
+                    </select>
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-department">Department</label>
+                    <select
+                      id="attrition-department"
+                      value={attritionForm.Department}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'Department',
+                          event.target.value
+                        )
+                      }
+                    >
+                      <option value="Research & Development">
+                        Research &amp; Development
+                      </option>
+                      <option value="Sales">Sales</option>
+                      <option value="Human Resources">Human Resources</option>
+                    </select>
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-jobrole">Job role</label>
+                    <select
+                      id="attrition-jobrole"
+                      value={attritionForm.JobRole}
+                      onChange={(event) =>
+                        updateAttritionField('JobRole', event.target.value)
+                      }
+                    >
+                      <option value="Healthcare Representative">
+                        Healthcare Representative
+                      </option>
+                      <option value="Human Resources">Human Resources</option>
+                      <option value="Laboratory Technician">
+                        Laboratory Technician
+                      </option>
+                      <option value="Manager">Manager</option>
+                      <option value="Manufacturing Director">
+                        Manufacturing Director
+                      </option>
+                      <option value="Research Director">Research Director</option>
+                      <option value="Research Scientist">Research Scientist</option>
+                      <option value="Sales Executive">Sales Executive</option>
+                      <option value="Sales Representative">
+                        Sales Representative
+                      </option>
+                    </select>
+                  </div>
+
+                  <div className="attrition-field">
+                    <label htmlFor="attrition-marital">Marital status</label>
+                    <select
+                      id="attrition-marital"
+                      value={attritionForm.MaritalStatus}
+                      onChange={(event) =>
+                        updateAttritionField(
+                          'MaritalStatus',
+                          event.target.value
+                        )
+                      }
+                    >
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                      <option value="Divorced">Divorced</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="attrition-actions">
+                  <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={predictingAttrition}
+                  >
+                    {predictingAttrition ? (
+                      <>
+                        <LoaderCircle size={17} className="attrition-spinner" />
+                        Predicting...
+                      </>
+                    ) : (
+                      <>
+                        <BrainCircuit size={17} />
+                        Predict attrition risk
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="subtle-button"
+                    disabled={predictingAttrition}
+                    onClick={() => {
+                      setAttritionForm({
+                        Age: '30',
+                        MonthlyIncome: '5000',
+                        JobSatisfaction: '3',
+                        WorkLifeBalance: '3',
+                        YearsAtCompany: '5',
+                        YearsInCurrentRole: '3',
+                        YearsSinceLastPromotion: '1',
+                        OverTime: '0',
+                        BusinessTravel: 'Travel_Rarely',
+                        Department: 'Research & Development',
+                        JobRole: 'Research Scientist',
+                        MaritalStatus: 'Single',
+                      })
+                      setPredictionResult(null)
+                      setAttritionError('')
+                    }}
+                  >
+                    <RefreshCw size={16} />
+                    Reset form
+                  </button>
+                </div>
+              </form>
+
+              {attritionError && (
+                <div className="attrition-message attrition-error" role="alert">
+                  <CircleAlert size={18} />
+                  <span>{attritionError}</span>
+                </div>
+              )}
+
+              {predictionResult && (
+                <div className="attrition-result" aria-live="polite">
+                  <div className="attrition-result-heading">
+                    <div>
+                      <span className="eyebrow">PREDICTION RESULT</span>
+                      <h3>Attrition risk assessment</h3>
+                    </div>
+                    <span className={`risk-pill ${riskClass}`}>
+                      {riskLevel || 'UNKNOWN'} RISK
+                    </span>
+                  </div>
+
+                  <div className="attrition-score">
+                    <strong>
+                      {Number(
+                        predictionResult.attrition_risk_percentage
+                      ).toFixed(1)}%
+                    </strong>
+                    <span>Predicted attrition risk</span>
+                  </div>
+
+                  <div className="attrition-progress-track">
+                    <div
+                      className={`attrition-progress-fill ${riskClass}`}
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.max(
+                            0,
+                            Number(
+                              predictionResult.attrition_risk_percentage
+                            ) || 0
+                          )
+                        )}%`,
+                      }}
+                    />
+                  </div>
+
+                  <p className="attrition-model-label">
+                    Model: {predictionResult.model_type || 'Not specified'}
+                  </p>
+
+                  <p className="attrition-disclaimer">
+                    {predictionResult.disclaimer ||
+                      'This score is an estimate, not a certainty. Use it only as decision support.'}
+                  </p>
+                </div>
+              )}
+
+              {role === 'ADMIN' && (
+                <div className="attrition-training">
+                  <div className="panel-heading">
+                    <div>
+                      <h2>Model management</h2>
+                      <p>
+                        Train or refresh the prediction model using the
+                        configured backend dataset.
+                      </p>
+                    </div>
+                    <RefreshCw size={21} color="#7667e8" />
+                  </div>
+
+                  <button
+                    type="button"
+                    className="subtle-button"
+                    onClick={handleTrainModel}
+                    disabled={trainingModel}
+                  >
+                    {trainingModel ? (
+                      <>
+                        <LoaderCircle
+                          size={17}
+                          className="attrition-spinner"
+                        />
+                        Training model...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw size={16} />
+                        Train attrition model
+                      </>
+                    )}
+                  </button>
+
+                  {trainingError && (
+                    <div
+                      className="attrition-message attrition-error"
+                      role="alert"
+                    >
+                      <CircleAlert size={18} />
+                      <span>{trainingError}</span>
+                    </div>
+                  )}
+
+                  {trainingResult && (
+                    <div className="training-summary" aria-live="polite">
+                      <h3>Training completed</h3>
+                      <div className="training-metrics">
+                        <div>
+                          <strong>
+                            {(
+                              Number(trainingResult.accuracy) * 100
+                            ).toFixed(1)}%
+                          </strong>
+                          <span>Accuracy</span>
+                        </div>
+                        <div>
+                          <strong>
+                            {trainingResult.roc_auc == null
+                              ? 'N/A'
+                              : (
+                                  Number(trainingResult.roc_auc) * 100
+                                ).toFixed(1) + '%'}
+                          </strong>
+                          <span>ROC-AUC</span>
+                        </div>
+                        <div>
+                          <strong>
+                            {Number(
+                              trainingResult.training_rows || 0
+                            ).toLocaleString()}
+                          </strong>
+                          <span>Training rows</span>
+                        </div>
+                        <div>
+                          <strong>
+                            {Number(
+                              trainingResult.testing_rows || 0
+                            ).toLocaleString()}
+                          </strong>
+                          <span>Testing rows</span>
+                        </div>
+                      </div>
+                      <p>
+                        Model: {trainingResult.model_type || 'Not specified'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="panel">
+              <div className="notice-box">
+                <CircleAlert size={18} />
+                Attrition predictions are available to HR and Admin users only.
+              </div>
+            </div>
+          )}
+
+
+          {canManage && (
+            <section className="panel attrition-history-panel">
+              <div className="panel-heading attrition-history-heading">
+                <div>
+                  <h2>Prediction history</h2>
+                  <p>
+                    Saved predictions from the backend, newest first.
+                    {` ${historyTotal} record${historyTotal === 1 ? '' : 's'} found.`}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="subtle-button"
+                  onClick={() => void loadAttritionHistory(historyPage)}
+                  disabled={historyLoading}
+                >
+                  <RefreshCw
+                    size={16}
+                    className={historyLoading ? 'attrition-spinner' : ''}
+                  />
+                  Refresh
+                </button>
+              </div>
+
+              <form
+                className="history-filters"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  applyAttritionHistoryFilters()
+                }}
+              >
+                <div className="attrition-field">
+                  <label htmlFor="history-employee-filter">Employee ID</label>
+                  <input
+                    id="history-employee-filter"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="All employees"
+                    value={historyEmployeeFilter}
+                    onChange={(event) => setHistoryEmployeeFilter(event.target.value)}
+                  />
+                </div>
+
+                <div className="attrition-field">
+                  <label htmlFor="history-risk-filter">Risk level</label>
+                  <select
+                    id="history-risk-filter"
+                    value={historyRiskFilter}
+                    onChange={(event) => setHistoryRiskFilter(event.target.value)}
+                  >
+                    <option value="">All risk levels</option>
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                  </select>
+                </div>
+
+                <div className="attrition-field">
+                  <label htmlFor="history-start-date">Start date</label>
+                  <input
+                    id="history-start-date"
+                    type="date"
+                    value={historyStartDateFilter}
+                    max={historyEndDateFilter || undefined}
+                    onChange={(event) => setHistoryStartDateFilter(event.target.value)}
+                  />
+                </div>
+
+                <div className="attrition-field">
+                  <label htmlFor="history-end-date">End date</label>
+                  <input
+                    id="history-end-date"
+                    type="date"
+                    value={historyEndDateFilter}
+                    min={historyStartDateFilter || undefined}
+                    onChange={(event) => setHistoryEndDateFilter(event.target.value)}
+                  />
+                </div>
+
+                <div className="attrition-field">
+                  <label htmlFor="history-model-filter">Model type</label>
+                  <select
+                    id="history-model-filter"
+                    value={historyModelTypeFilter}
+                    onChange={(event) => setHistoryModelTypeFilter(event.target.value)}
+                  >
+                    <option value="">All model types</option>
+                    <option value="Logistic Regression">Logistic Regression</option>
+                  </select>
+                </div>
+
+                <button type="submit" className="subtle-button">
+                  Apply filters
+                </button>
+
+                <button
+                  type="button"
+                  className="subtle-button"
+                  onClick={() => void exportAttritionHistoryCSV()}
+                  disabled={historyLoading}
+                >
+                  <Download size={16} />
+                  Export CSV
+                </button>
+
+                <button
+                  type="button"
+                  className="subtle-button"
+                  onClick={exportAttritionHistoryPDF}
+                  disabled={historyLoading}
+                >
+                  <Download size={16} />
+                  Export PDF
+                </button>
+
+                <button
+                  type="button"
+                  className="subtle-button"
+                  onClick={resetAttritionHistoryFilters}
+                  disabled={historyLoading}
+                >
+                  Reset filters
+                </button>
+              </form>
+
+              {historyError && (
+                <div className="attrition-message attrition-error" role="alert">
+                  <CircleAlert size={18} />
+                  <span>{historyError}</span>
+                </div>
+              )}
+
+              <div className="history-table-wrap">
+                <table className="attrition-history-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Employee ID</th>
+                      <th>Risk</th>
+                      <th>Probability</th>
+                      <th>Model</th>
+                      <th>Predicted by</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historyLoading ? (
+                      <tr>
+                        <td colSpan={6} className="history-empty">
+                          Loading prediction history...
+                        </td>
+                      </tr>
+                    ) : historyItems.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="history-empty">
+                          No saved predictions found for these filters.
+                        </td>
+                      </tr>
+                    ) : (
+                      historyItems.map((item) => {
+                        const level = String(item.risk_level || '').toUpperCase()
+                        const levelClass = ['LOW', 'MEDIUM', 'HIGH'].includes(level)
+                          ? `risk-${level.toLowerCase()}`
+                          : ''
+
+                        return (
+                          <tr key={item.id}>
+                            <td>
+                              {(() => {
+                                if (!item.created_at) return 'Date unavailable'
+
+                                const parsedDate = new Date(item.created_at)
+
+                                return Number.isNaN(parsedDate.getTime())
+                                  ? 'Invalid date'
+                                  : parsedDate.toLocaleString()
+                              })()}
+                            </td>
+                            <td>{item.employee_id ?? 'General prediction'}</td>
+                            <td>
+                              <span className={`risk-badge ${levelClass}`}>
+                                {level || 'UNKNOWN'}
+                              </span>
+                            </td>
+                            <td>
+                              {Number(item.attrition_risk_percentage ?? 0).toFixed(1)}%
+                            </td>
+                            <td>{item.model_type || '?'}</td>
+                            <td>{item.predicted_by_name || `User #${item.predicted_by_user_id ?? '?'}`}</td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="history-pagination">
+                <span>
+                  Page {historyPage} of {Math.max(1, Math.ceil(historyTotal / historyPageSize))}
+                </span>
+                <div>
+                  <button
+                    type="button"
+                    className="subtle-button"
+                    disabled={historyLoading || historyPage <= 1}
+                    onClick={() => void loadAttritionHistory(historyPage - 1)}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    className="subtle-button"
+                    disabled={
+                      historyLoading ||
+                      historyPage >= Math.max(1, Math.ceil(historyTotal / historyPageSize))
+                    }
+                    onClick={() => void loadAttritionHistory(historyPage + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
+
+          <div className="panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Illustrative employee risk review</h2>
+                <p>
+                  Demo profiles only; these are not live predictions for
+                  actual employees.
+                </p>
+              </div>
+              <Sparkles size={22} color="#7667e8" />
+            </div>
+
+            <EmployeeTable employees={initialEmployees} />
+          </div>
+
+          <div className="notice-box">
+            <CircleAlert size={18} />
+            Predictions are estimates and may be wrong. Do not use a risk
+            score alone to make employment decisions. Protect employee data
+            and review outcomes fairly with human oversight.
+          </div>
+        </section>
+      )
+    }
+
+    if (activePage === 'Analytics') {
+      return (
+        <section className="analytics-page">
+          <div className="panel chart-panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Workforce trend</h2>
+                <p>Illustrative monthly employee and attrition activity.</p>
+              </div>
+              <CalendarDays size={19} color="#77748c" />
+            </div>
+
+            <div className="chart-wrap large-chart">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="employeesGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#7667e8" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#7667e8" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eeedf4" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9693a7', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9693a7', fontSize: 12 }} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="employees" stroke="#7667e8" strokeWidth={3} fill="url(#employeesGradient)" />
+                  <Area type="monotone" dataKey="attrition" stroke="#36b8a0" strokeWidth={2} fill="transparent" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="panel chart-panel">
+            <h2>Department distribution</h2>
+            <p>Illustrative demo data — not live department analytics.</p>
+
+            <div className="chart-wrap pie-wrap">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={dashboardData.departments.filter((item) => item.value !== null && item.value > 0)}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={62}
+                    outerRadius={92}
+                    paddingAngle={4}
+                    stroke="none"
+                  >
+                    {demoDepartmentData.map((item) => (
+                      <Cell key={item.name} fill={item.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {demoDepartmentData.map((item) => (
+              <div className="legend-row" key={item.name}>
+                <span><i style={{ background: item.color }} />{item.name}</span>
+                <strong>{item.value}%</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="notice-box">
+            <CircleAlert size={17} />
+            Analytics charts use illustrative data and are not live company metrics.
+          </div>
+        </section>
+      )
+    }
+
+    return (
+      <>
+        <section className="metrics-grid">
+          <MetricCard label="Total employees" value={dashboardData.loading && dashboardData.employeeCount === null ? "Loading..." : dashboardData.employeeCount !== null ? dashboardData.employeeCount.toLocaleString() : "Unavailable"} icon={Users} tone="violet" detail={dashboardData.employeeCount !== null ? "Active employees from backend" : dashboardData.error || "Live employee count unavailable"} />
+          <MetricCard label="Attrition rate" value="Unavailable" icon={TrendingUp} tone="mint" detail="A live attrition rate metric is not available from the current dashboard API." />
+          <MetricCard label="High-risk employees" value={dashboardData.loading && dashboardData.highRiskPredictions === null ? "Loading..." : dashboardData.highRiskPredictions !== null ? dashboardData.highRiskPredictions.toLocaleString() : "Unavailable"} icon={CircleAlert} tone="rose" detail={dashboardData.highRiskPredictions !== null ? "High-risk prediction records from backend" : dashboardData.error || "Live high-risk count unavailable"} />
+          <MetricCard label="Open positions" value="Unavailable" icon={BriefcaseBusiness} tone="amber" detail="Open positions data is not available from the current dashboard API." />
+        </section>
+
+        <section className="main-charts">
+          <div className="panel chart-panel workforce-chart">
+            <div className="panel-heading">
+              <div>
+                <h2>Workforce overview</h2>
+                <p>Illustrative demo data — not live historical analytics</p>
+              </div>
+              <span className="subtle-button">
+                <CalendarDays size={15} /> Demo period <ChevronDown size={14} />
+              </span>
+            </div>
+
+            <div className="chart-legend">
+              <span><i className="legend-violet" /> Employees</span>
+              <span><i className="legend-mint" /> Attrition cases</span>
+            </div>
+
+            <div className="chart-wrap">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="mainGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#7667e8" stopOpacity={0.22} />
+                      <stop offset="95%" stopColor="#7667e8" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eeedf4" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9693a7', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9693a7', fontSize: 12 }} />
+                  <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #eceaf4', fontSize: 12 }} />
+                  <Area type="monotone" dataKey="employees" stroke="#7667e8" strokeWidth={3} fill="url(#mainGradient)" />
+                  <Area type="monotone" dataKey="attrition" stroke="#36b8a0" strokeWidth={2} fill="transparent" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="panel chart-panel department-chart">
+            <div className="panel-heading">
+              <div>
+                <h2>Departments</h2>
+                <p>Active employees by department</p>
+              </div>
+              <button
+                className="icon-button"
+                aria-label="Department details"
+                onClick={() => setActivePage('Departments')}
+              >
+                <ArrowUpRight size={18} />
+              </button>
+            </div>
+
+            {dashboardData.loading ? (
+              <p>Loading department data...</p>
+            ) : dashboardData.departments.length === 0 ? (
+              <p>{dashboardData.error || "No department data is available yet."}</p>
+            ) : (
+              <>
+                <div className="chart-wrap pie-wrap">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={dashboardData.departments.filter((item) => item.value !== null && item.value > 0)}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={59}
+                        outerRadius={84}
+                        paddingAngle={4}
+                        stroke="none"
+                      >
+                        {dashboardData.departments
+                          .filter((item) => item.value !== null && item.value > 0)
+                          .map((item) => (
+                            <Cell key={item.id} fill={item.color} />
+                          ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="donut-center">
+                    <strong>
+                      {dashboardData.employeeCount === null
+                        ? "Unavailable"
+                        : dashboardData.employeeCount.toLocaleString()}
+                    </strong>
+                    <span>Active employees</span>
+                  </div>
+                </div>
+
+                <div className="department-legend">
+                  {dashboardData.departments.map((item) => (
+                    <div className="legend-row" key={item.id}>
+                      <span>
+                        <i style={{ background: item.color }} />
+                        {item.name}
+                      </span>
+                      <strong>
+                        {item.value === null
+                          ? "Unavailable"
+                          : item.value.toLocaleString()}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+
+        <section className="panel employee-panel">
+          <div className="panel-heading employee-heading">
+            <div>
+              <h2>Employee risk overview</h2>
+              <p>Illustrative retention profiles</p>
+            </div>
+            <button className="text-button" onClick={() => setActivePage('Employees')}>
+              View directory <ArrowUpRight size={15} />
+            </button>
+          </div>
+
+          <div className="table-tools">
+            <div className="search-box">
+              <Search size={16} />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search demo employees..."
+              />
+            </div>
+            <button
+              className="subtle-button"
+              onClick={() => showNotice('Export will be connected to live workforce data in a later step.')}
+            >
+              <Download size={15} /> Export
+            </button>
+          </div>
+
+          <EmployeeTable
+            employees={initialEmployees.filter((employee) =>
+              `${employee.name} ${employee.role} ${employee.department}`
+                .toLowerCase().includes(search.toLowerCase())
+            ).slice(0, 5)}
+          />
+
+          <div className="table-footer">
+            Showing illustrative demo profiles
+            <button onClick={() => setActivePage('Employees')}>
+              View directory <ArrowUpRight size={14} />
+            </button>
+          </div>
+        </section>
+
+        <div className="dashboard-footnote">
+          <CircleAlert size={15} />
+          Employee counts and high-risk prediction records are loaded from the backend when available.
+          Workforce trends and other illustrative charts are demo data; unavailable metrics are not shown as real values.
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <div className="app-shell">
+      {mobileMenu && (
+        <button
+          className="mobile-overlay"
+          aria-label="Close navigation"
+          onClick={() => setMobileMenu(false)}
+        />
+      )}
+
+      <aside className={`sidebar ${mobileMenu ? 'sidebar-open' : ''}`}>
+        <div className="brand">
+          <div className="brand-mark"><BrainCircuit size={22} /></div>
+          <div>
+            <strong>WorkForce<span>AI</span></strong>
+            <small>PEOPLE INTELLIGENCE</small>
+          </div>
+          <button
+            className="mobile-close"
+            onClick={() => setMobileMenu(false)}
+            aria-label="Close menu"
+          >
+            <X size={19} />
+          </button>
+        </div>
+
+        <div className="workspace-label">WORKSPACE</div>
+
+        <div className="workspace-switch">
+          <div className="workspace-avatar">W</div>
+          <div><strong>Workforce HQ</strong><small>{role} workspace</small></div>
+          <ChevronDown size={15} />
+        </div>
+
+        <div className="nav-label">MENU</div>
+
+        <nav className="main-nav">
+          {navigation.map(({ label, icon: Icon }) => {
+            const restricted = ['Employees', 'Departments', 'Attrition AI'].includes(label) && !canManage
+
+            return (
+              <button
+                key={label}
+                className={`nav-item ${activePage === label ? 'active' : ''}`}
+                onClick={() => {
+                  setActivePage(label)
+                  setMobileMenu(false)
+
+                  if (restricted) {
+                    showNotice('Indha section-ku HR/Admin permission thevai.')
+                  }
+                }}
+              >
+                <Icon size={19} strokeWidth={1.8} />
+                <span>{label}</span>
+                {label === 'Attrition AI' && <span className="nav-badge">AI</span>}
+              </button>
+            )
+          })}
+        </nav>
+
+        <div className="sidebar-bottom">
+          <div className="nav-label">PREFERENCES</div>
+
+          <button
+            className={`nav-item ${activePage === 'Settings' ? 'active' : ''}`}
+            onClick={() => setActivePage('Settings')}
+          >
+            <Settings size={19} />
+            <span>Settings</span>
+          </button>
+
+          <div className="upgrade-card">
+            <div className="upgrade-icon"><Sparkles size={18} /></div>
+            <strong>Unlock workforce insights</strong>
+            <p>Explore smarter retention strategies with AI.</p>
+            <button onClick={() => setActivePage('Attrition AI')}>
+              Explore AI <ArrowUpRight size={14} />
+            </button>
+          </div>
+
+          <div className="profile-card">
+            <div className="profile-avatar">{initials}</div>
+            <div className="profile-details">
+              <strong>{displayName}</strong>
+              <small>{role}</small>
+            </div>
+            <button
+              className="icon-button"
+              aria-label="Log out"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              {loggingOut
+                ? <LoaderCircle className="spin-icon" size={16} />
+                : <LogOut size={16} />}
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main className="main-area">
+        <header className="topbar">
+          <div className="topbar-left">
+            <button
+              className="mobile-menu-button"
+              onClick={() => setMobileMenu(true)}
+              aria-label="Open navigation"
+            >
+              <Menu size={21} />
+            </button>
+            <div className="breadcrumbs">
+              Workspace <span>/</span> <strong>{activePage}</strong>
+            </div>
+          </div>
+
+          <div className="topbar-right">
+            <div className="top-search">
+              <Search size={17} />
+              <input aria-label="Search dashboard" placeholder="Search anything..." />
+            </div>
+
+            <button
+              className="notification-button"
+              aria-label="Notifications"
+              onClick={() => showNotice('You are all caught up! No new notifications.')}
+            >
+              <Bell size={19} />
+              <span />
+            </button>
+
+            <div className="topbar-divider" />
+
+            <div className="top-profile">
+              <div className="profile-avatar">{initials}</div>
+              <div><strong>{displayName}</strong><small>{role}</small></div>
+              <button
+                className="icon-button"
+                aria-label="Log out"
+                onClick={handleLogout}
+                disabled={loggingOut}
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div className="page-content">
+          <div className="page-heading">
+            <div>
+              <div className="greeting">
+                <Sparkles size={16} /> PEOPLE INTELLIGENCE PLATFORM
+              </div>
+              <h1>
+                {activePage === 'Overview'
+                  ? `Welcome, ${displayName.split(' ')[0]}`
+                  : activePage}
+              </h1>
+              <p>
+                {activePage === 'Overview'
+                  ? 'Your workforce intelligence workspace is ready.'
+                  : `Explore your ${activePage.toLowerCase()} workspace and workforce insights.`}
+              </p>
+            </div>
+
+            <div className="heading-actions">
+              <span className="subtle-button">
+                <CircleCheck size={15} /> Signed in
+              </span>
+            </div>
+          </div>
+
+          {notice && (
+            <div className="toast">
+              <CircleCheck size={18} />
+              {notice}
+              <button onClick={() => setNotice('')} aria-label="Dismiss notification">
+                <X size={16} />
+              </button>
+            </div>
+          )}
+
+          {activePage === 'Settings' ? (
+            <section className="panel settings-panel">
+              <h2>Account and workspace</h2>
+              <p>Authentication is connected to the WorkForce AI Pro backend.</p>
+
+              <div className="settings-row">
+                <div>
+                  <strong>Signed-in account</strong>
+                  <small>{user?.email || 'Email unavailable'}</small>
+                </div>
+                <span className="settings-status">{role}</span>
+              </div>
+
+              <div className="settings-row">
+                <div>
+                  <strong>Session authentication</strong>
+                  <small>JWT bearer token is stored in browser local storage.</small>
+                </div>
+                <span className="settings-status">Active</span>
+              </div>
+
+              <div className="settings-row">
+                <div>
+                  <strong>Role-based access</strong>
+                  <small>Admin and HR roles can access workforce management sections.</small>
+                </div>
+                <span className="settings-status">
+                  {canManage ? 'Management access' : 'Employee access'}
+                </span>
+              </div>
+
+              <div className="settings-row">
+                <div>
+                  <strong>Sign out</strong>
+                  <small>Clear the current browser session.</small>
+                </div>
+                <button className="subtle-button" onClick={handleLogout}>
+                  <LogOut size={15} /> Log out
+                </button>
+              </div>
+            </section>
+          ) : renderContent()}
+        </div>
+
+        <footer className="app-footer">
+          <span>© 2026 WorkForce AI Pro</span>
+          <span><i /> Authenticated workspace <b>·</b> {role}</span>
+        </footer>
+      </main>
+
+      {showAdd && (
+        <div className="modal-backdrop" onClick={() => setShowAdd(false)}>
+          <form
+            className="add-modal"
+            onSubmit={addEmployee}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <h2>Add employee</h2>
+                <p>Create an employee profile linked to an existing user account.</p>
+              </div>
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowAdd(false)}
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <label>
+              Employee code *
+              <input
+                name="employee_code"
+                value={newEmployee.employee_code}
+                onChange={updateEmployeeField}
+                placeholder="e.g. EMP-1001"
+                minLength={2}
+                maxLength={30}
+                required
+              />
+            </label>
+
+            <label>
+              Registered User *
+              <select
+                name="user_id"
+                value={newEmployee.user_id}
+                onChange={updateEmployeeField}
+                required
+                disabled={availableUsersLoading || availableUsers.length === 0}
+              >
+                <option value="">
+                  {availableUsersLoading
+                    ? 'Loading registered users...'
+                    : availableUsers.length === 0
+                      ? 'No available users — register a user first'
+                      : 'Select a registered user'}
+                </option>
+                {availableUsers.map((availableUser) => (
+                  <option key={availableUser.id} value={availableUser.id}>
+                    {availableUser.full_name} — {availableUser.email}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Department
+              <select
+                name="department_id"
+                value={newEmployee.department_id}
+                onChange={updateEmployeeField}
+              >
+                <option value="">No department</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Designation *
+              <input
+                name="designation"
+                value={newEmployee.designation}
+                onChange={updateEmployeeField}
+                placeholder="e.g. Software Engineer"
+                minLength={2}
+                maxLength={100}
+                required
+              />
+            </label>
+
+            <label>
+              Joining date *
+              <input
+                name="joining_date"
+                type="date"
+                value={newEmployee.joining_date}
+                onChange={updateEmployeeField}
+                required
+              />
+            </label>
+
+            <label>
+              Salary
+              <input
+                name="salary"
+                type="number"
+                min="0"
+                step="0.01"
+                value={newEmployee.salary}
+                onChange={updateEmployeeField}
+                placeholder="0.00"
+              />
+            </label>
+
+            <label>
+              Phone number
+              <input
+                name="phone"
+                type="tel"
+                maxLength={20}
+                value={newEmployee.phone}
+                onChange={updateEmployeeField}
+                placeholder="Optional"
+              />
+            </label>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="subtle-button"
+                onClick={() => setShowAdd(false)}
+                disabled={savingEmployee}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="primary-button"
+                disabled={savingEmployee}
+              >
+                {savingEmployee
+                  ? <LoaderCircle className="spin-icon" size={16} />
+                  : <UserPlus size={16} />}
+                {savingEmployee ? 'Creating...' : 'Create employee'}
+              </button>
+            </div>
+
+            <p className="modal-footnote">
+              User ID must belong to an existing account. The backend validates
+              the employee code, user and department.
+            </p>
+          </form>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MetricCard({ label, value, change, positive, icon: Icon, tone, detail }) {
+  return (
+    <article className="metric-card">
+      <div className="metric-top">
+        <span>{label}</span>
+        <div className={`metric-icon ${tone}`}>
+          <Icon size={20} strokeWidth={1.8} />
+        </div>
+      </div>
+
+      <div className="metric-value">{value}</div>
+
+      <div className="metric-bottom">
+        <span className={`metric-change ${positive ? 'positive' : 'negative'}`}>
+          {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+          {change}
+        </span>
+        <span>{detail}</span>
+      </div>
+    </article>
+  )
+}
+
+function EmployeeTable({ employees }) {
+  if (!employees.length) {
+    return <div className="empty-state">No employee records found.</div>
+  }
+
+  return (
+    <div className="table-scroll">
+      <table className="employee-table">
+        <thead>
+          <tr>
+            <th>EMPLOYEE</th>
+            <th>DEPARTMENT</th>
+            <th>ATTRITION RISK</th>
+            <th>RISK SCORE</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {employees.map((employee, index) => {
+            const isDemo = Boolean(employee.demo)
+            const employeeName = isDemo
+              ? employee.name
+              : employee.name || employee.employee_code || `Employee #${employee.id}`
+
+            const subtitle = isDemo
+              ? employee.role
+              : employee.designation || 'Designation not set'
+
+            const initials = isDemo
+              ? employee.initials || getInitials(employee.name)
+              : getInitials(employee.name || employee.employee_code || `E${employee.id}`)
+
+            return (
+              <tr key={employee.id ?? `${employeeName}-${index}`}>
+                <td>
+                  <div className="employee-identity">
+                    <div className={`employee-avatar ${employee.color || 'purple'}`}>
+                      {initials}
+                    </div>
+
+                    <div>
+                      <strong>{employeeName}</strong>
+                      <small>
+                        {isDemo
+                          ? subtitle
+                          : `${subtitle} · User ID ${employee.user_id}`}
+                      </small>
+                      {!isDemo && employee.email && (
+                        <small>{employee.email}</small>
+                      )}
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  {isDemo
+                    ? employee.department || 'Not assigned'
+                    : employee.department_name || (
+                        employee.department_id
+                          ? `Department #${employee.department_id}`
+                          : 'Not assigned'
+                      )}
+                </td>
+
+                <td>
+                  {isDemo ? (
+                    <span className={`risk-badge ${(employee.risk || 'Low').toLowerCase()}`}>
+                      <i />
+                      {employee.risk || 'Unknown'}
+                    </span>
+                  ) : (
+                    <span className="risk-badge">Not calculated</span>
+                  )}
+                </td>
+
+                <td>
+                  {isDemo && Number.isFinite(employee.score) ? (
+                    <div className="score-cell">
+                      <div className="score-track">
+                        <span
+                          className={(employee.risk || 'Low').toLowerCase()}
+                          style={{
+                            width: `${Math.max(0, Math.min(100, employee.score))}%`,
+                          }}
+                        />
+                      </div>
+                      <strong>{employee.score}%</strong>
+                    </div>
+                  ) : (
+                    '—'
+                  )}
+                </td>
+
+                <td>
+                  <span className="active-status">
+                    <i />
+                    {isDemo
+                      ? 'Demo'
+                      : employee.is_active
+                        ? 'Active'
+                        : 'Inactive'}
+                  </span>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+export default App
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
